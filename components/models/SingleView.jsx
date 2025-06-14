@@ -3,7 +3,7 @@
 // import React from 'react'
 import React, { useState, useEffect ,useRef } from 'react';
 import { useParams ,usePathname  } from "next/navigation";
-import Link from 'next/link';
+// import Link from 'next/link';
 
 // import { Link , useLocation } from 'react-router-dom';
 import axios from 'axios'
@@ -19,7 +19,7 @@ const ImageModal = React.lazy(() => import('../images/ImageModal.jsx'));
 // import Timeline_view from '../../../components/events/Timeline_view.jsx';
 // import FixedMenu from './FixedMenu.jsx';
 // import { Fancybox } from "@fancyapps/ui";
-import "@fancyapps/ui/dist/fancybox/fancybox.css";
+// import "@fancyapps/ui/dist/fancybox/fancybox.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {  faFacebook, faLinkedin, faYoutube, faTiktok, faInstagram } from '@fortawesome/free-brands-svg-icons';
 import {faShare,faCalendar, faUserPlus,faUser, faImage,faFilm  ,faThumbsUp,faHeart,faComment, faInfo} from '@fortawesome/free-solid-svg-icons';
