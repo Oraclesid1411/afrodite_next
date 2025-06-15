@@ -402,7 +402,7 @@ const handleOpenModal = (modalId, e) => {
                                         </li>
 
                                         <li className="menu-list-item nav-item " >
-                                              <a className="nav-link" href="/evenements">
+                                              <a className="nav-link" href="/evenements/calendar">
                                                         Events
                                                     </a>
                                        </li>
@@ -574,7 +574,7 @@ const handleOpenModal = (modalId, e) => {
                             </li>
                             
                             <li className="menu-list-item nav-item " >
-                                              <a className="nav-link" href="/evenements">
+                                              <a className="nav-link" href="/evenements/calendar">
                                                         Events
                                                     </a>
                                        </li>
@@ -741,7 +741,7 @@ const handleOpenModal = (modalId, e) => {
 
                                      
                                         <li className="menu-list-item nav-item " >
-                                              <a className="nav-link" href="/evenements">
+                                              <a className="nav-link" href="/evenements/calendar">
                                                         Events
                                                     </a>
                                        </li>
@@ -910,7 +910,7 @@ const handleOpenModal = (modalId, e) => {
 
                                      
                                         <li className="menu-list-item nav-item " >
-                                              <a className="nav-link" href="/evenements">
+                                              <a className="nav-link" href="/evenements/calendar">
                                                         Events
                                                     </a>
                                        </li>
@@ -1078,7 +1078,7 @@ const handleOpenModal = (modalId, e) => {
 
                                      
                                         <li className="menu-list-item nav-item active" >
-                                              <a className="nav-link" href="/evenements">
+                                              <a className="nav-link" href="/evenements/calendar">
                                                         Events
                                                     </a>
                                        </li>
@@ -1245,7 +1245,7 @@ const handleOpenModal = (modalId, e) => {
 
                                      
                                         <li className="menu-list-item nav-item" >
-                                              <a className="nav-link" href="/evenements">
+                                              <a className="nav-link" href="/evenements/calendar">
                                                         Events
                                                     </a>
                                        </li>
@@ -1413,7 +1413,7 @@ const handleOpenModal = (modalId, e) => {
                                         </li>
 
                                         <li className="menu-list-item nav-item " >
-                                              <a className="nav-link" href="/evenements">
+                                              <a className="nav-link" href="/evenements/calendar">
                                                         Events
                                                     </a>
                                        </li>

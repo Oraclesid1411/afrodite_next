@@ -405,7 +405,7 @@ useEffect(() => {
                            
                           (
                             <button 
-                            onClick={() => router.push(`/event_timelines`)}
+                            onClick={() => router.push(`/evenements/timeline`)}
        
                             className="view_btn timeline" data-mode="timelines">
                            <FontAwesomeIcon icon={faList}/>

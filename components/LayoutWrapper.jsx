@@ -9,7 +9,7 @@ import { ToastContainer } from 'react-toastify';
 
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
-  const isAuthPage = ['/login', '/register', '/forgotpass'].includes(pathname);
+  const isAuthPage = ['/login', '/register', '/forgotpass', '/postuler'].includes(pathname);
 
   return (
     <div id="root">

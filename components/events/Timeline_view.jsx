@@ -1,14 +1,6 @@
 // import React from 'react'
 import React, { useState, useEffect ,useRef } from 'react';
-
-import axios from 'axios';
-// import { FaChevronUp, FaChevronRight, FaChevronDown } from 'react-icons/fa';
-// import { useNavigate } from 'react-router-dom';
 import { useRouter } from "next/navigation";
-// import default_img from '/assets/img/event/event_2.jpeg'
-// import Header_menu from "../Components/Header_menu";
-
-// import Footer from "../Components/Footer";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faList,faMapMarkerAlt, faSearch,faChevronDown,faChevronRight, faChevronLeft ,faClock,faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
@@ -20,11 +12,7 @@ import ZoomView from './ZoomView';
 function Timeline_view({events , links , setTypeView_N}) {
 
    const apiUrl = 'https://apiafro.aafrodites.com'
-  // const apiUrl = 'http://localhost:5000'
-  //  const [loading, setLoading] = useState(true); // Loader state
-   
-
-    // get all events
+     // get all events
      const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
  const [filteredEvents_b, setFilteredEvents_b] = useState([]);
@@ -190,22 +178,9 @@ const categoriesList = [
   const handleToggle = (id) => {
     setActiveEvent(activeEvent === id ? null : id); // Toggle pour ouvrir ou fermer les détails
   };
-
-  // Trier les événements du plus récent au plus ancien
-  // const sortedEvents = [...events].sort((a, b) => new Date(a.date) - new Date(b.date));
-
-  // console.log("groupedEvents")
-  // console.log(groupedEvents)
-  // console.log("filteredEvents_b")
-  // console.log(filteredEvents_b)
-
   
-  // Afficher un loader si la page est en cours de chargement
- 
   return (
     <>
-
-<Header_menu data={{ link: 'events' }} />
      
      
      <div className="main_container event_ihm">
@@ -220,7 +195,7 @@ const categoriesList = [
                                             <button 
                    
                    
-                   onClick={() => router.push(`/events_calendar`)}
+                   onClick={() => router.push(`/evenements/calendar`)}
                   //  onClick={() => setTypeView_N("calendar")}
                     className="view_btn calendar">
                         <FontAwesomeIcon icon={faCalendar}/>

@@ -2,15 +2,17 @@
 
 import { useSearchParams } from 'next/navigation';
 
-export default function CreerCompteBusinessPage() {
+export default function CreerFranchisePage() {
   const searchParams = useSearchParams();
   const demande = searchParams.get('demande');
 
   return (
+    
     <div className="p-4">
-      <h1>Créer un compte Business</h1>
+      <h1>Créer une Franchise</h1>
       <p>Demande : {demande}</p>
-      {/* Contenu pour engager une Afrodite */}
+
+      {/* Contenu spécifique à la création de franchise */}
     </div>
   );
 }

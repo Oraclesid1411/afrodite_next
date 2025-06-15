@@ -1,33 +1,26 @@
+'use client';
+
 import axios from "axios";
-import { useNavigate, Link, useLocation } from "react-router-dom";
+
+
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+
 import { useState, useEffect ,useRef  } from "react"; 
-// import Header_banner from '../Components/Header_banner';   
-import { FaChevronLeft, FaChevronRight, FaChevronDown } from 'react-icons/fa';
-import * as Select from "@radix-ui/react-select";
-import { FaSignal, FaCar } from "react-icons/fa";
-// import { ChevronDown } from "lucide-react";
+ import { FaChevronLeft} from 'react-icons/fa';
+ import { FaWhatsapp, FaTelegram } from "react-icons/fa";
+ import { useAuth } from "../../Context/AuthenticateContext.jsx";
+// import face_image from  "/assets/icone_person/face.webp";
 
-// import { CheckSquare, Square } from "lucide-react";
-import { FaWhatsapp, FaTelegram } from "react-icons/fa";
-// import Locations from '../../Components/Locations.jsx';
-import { useAuth } from "../../Context/AuthenticateContext.jsx";
-import face_image from  "/assets/icone_person/face.webp";
+// import plain_pied_image from  "/assets/icone_person/pp.webp";
 
-import plain_pied_image from  "/assets/icone_person/pp.webp";
-
-import profil_image from  "/assets/icone_person/profil.webp";
+// import profil_image from  "/assets/icone_person/profil.webp";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome' 
-import { faCamera,faCheckDouble, faImage,faRepeat, faPlus, faTimes, faEdit, faTrash, faKitchenSet } from '@fortawesome/free-solid-svg-icons'
-
-import { PhoneInput } from "react-international-phone";
+import { faCamera, faImage,faRepeat, faPlus, faTimes, faEdit, faTrash, faKitchenSet } from '@fortawesome/free-solid-svg-icons'
 import "react-international-phone/style.css";
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faXTwitter, faFacebook, faLinkedin, faYoutube, faWhatsapp, faTiktok, faInstagram } from '@fortawesome/free-brands-svg-icons';
-import {faUser} from '@fortawesome/free-solid-svg-icons';
-
+ 
 import imageCompression from 'browser-image-compression';
 
 import moment from 'moment';
@@ -40,18 +33,30 @@ import {
   faYoutube,
   faTiktok,
 } from "@fortawesome/free-brands-svg-icons";
-import parsePhoneNumber from "libphonenumber-js";
+// import parsePhoneNumber from "libphonenumber-js";
 import { motion } from "framer-motion";
 import { Tooltip } from "react-tooltip";
 
 import Locations from '../../Components/Locations_models.jsx';
-import CountrySelector from "../../Components/CountrySelector.jsx";
-function PostulerModels() {
-      const navigate = useNavigate();
-      const location = useLocation();
-      const apiUrl = "https://apiafro.aafrodites.com";
+// import CountrySelector from "../../Components/CountrySelector.jsx";
 
-      const [checked, setChecked] = useState(false);
+
+function PostulerModels() {
+       const apiUrl = "https://apiafro.aafrodites.com";
+       const router = useRouter();         // remplace useNavigate()
+       const pathname = usePathname();     // équivalent de location.pathname
+       const searchParams = useSearchParams(); // équivalent de location.search
+       const auth = useAuth(); 
+       const user_info = auth.currentUser 
+       const [newSave, setNewSave] = useState(0);
+       const [contacter_afrodites, setContacter_afrodites] = useState(0);
+ 
+       const [date, setDate] = useState({ day: "", month: "", year: "" });
+       const dayRef = useRef(null);
+       const monthRef = useRef(null);
+       const yearRef = useRef(null);
+ 
+      // const [checked, setChecked] = useState(false);
       const [isOpen_more, setIsOpen_more] = useState(false);
       const [selectedOption_more, setSelectedOption_more] = useState(""); // Stocke l'option sélectionnée
       const dropdownRef_more = useRef(null);
@@ -60,20 +65,12 @@ function PostulerModels() {
     const dropdownRef = useRef(null);
     const [code_pays, setcode_pays] = useState("+228");
    
-    const categoriesList = [
-      { id: 1, label: "Mannequin" },
-      { id: 2, label: "Vlogueuse" },
-      { id: 3, label: "Hôtesse" }
-    ];
-
-
-    // selection de num et reseau sociaux
-    const [selectedOption_rx, setSelectedOption_rx] = useState("whatsapp");
-    const [showOptions_rx, setShowOptions_rx] = useState(false);
-    const [selectedCategories_rx, setSelectedCategories_rx] = useState([]); // Liste des catégories sélectionnées
+    //  const [selectedCategories_rx, setSelectedCategories_rx] = useState([]); // Liste des catégories sélectionnées
     const [isOpen_rx, setIsOpen_rx] = useState(false); // Etat pour gérer l'ouverture/fermeture du dropdown
     const dropdownRef_rx = useRef(null);
-  
+ 
+    console.log('searchParams:', searchParams)
+
     useEffect(() => {
      
       const handleClickOutside_rx = (event) => {
@@ -101,91 +98,9 @@ const [selectedOptions_rx, setSelectedOptions_rx] = useState([]);
 useEffect(() => {
   setSelectedOptions_rx([]);
 }, []);
-
- // Fonction pour gérer les changements de sélection des checkboxes
- const handleCheckboxChange_rx = (optionId) => {
-  if (selectedCategories_rx.includes(optionId)) {
-    setSelectedCategories_rx(selectedCategories_rx.filter((id) => id !== optionId)); // Désélectionner
-  } else {
-    setSelectedCategories_rx([...selectedCategories_rx, optionId]); // Sélectionner
-  }
-};
-
-// const handleCheckboxChange_R = (id) => {
-//   console.log("handledata")
-//   if (selectedOptions_rx.includes(id)) {
-//     setSelectedOptions_rx([]); // Décoche tout si on reclique sur l'élément sélectionné
-//   } else {
-//     setSelectedOptions_rx([id]); // Sélectionne uniquement l'élément cliqué
-//   }
-// };
-// const handleCheckboxChange_R = (id) => {
-//   let updatedSelection;
-//   if (selectedOptions_rx.includes(id)) {
-//     updatedSelection = selectedOptions_rx.filter((item) => item !== id);
-//   } else {
-//     updatedSelection = [...selectedOptions_rx, id];
-//   }
-//   setSelectedOptions_rx(updatedSelection);
-
-//   // Afficher le dropdown si aucun élément n'est coché
-//   setIsOpen_rx(updatedSelection.length === 0);
-// };
-
-// Fonction pour gérer le clic sur le bouton "+"
-// const handlePlusClick_rx = (e) => {
-//   e.preventDefault(); // Empêche la soumission du formulaire
-
-  
-//   setIsOpen_rx(!isOpen_rx);
-
-//   if (dropdownRef_rx.current) {
-//     const dropdownRect = dropdownRef_rx.current.getBoundingClientRect();
-//     const windowWidth = window.innerWidth;
-
-//     if (dropdownRect.right > windowWidth) {
-//       setDropdownDirection("left");
-//     } else {
-//       setDropdownDirection("right");
-//     }
-//   }
-// };
-
-// const handleCheckboxChange_R = (id, network) => {
-//   setSelectedOptions_rx((prev) => {
-//     const isSelected = prev.includes(id);
-
-//     // Mise à jour de formData en fonction du réseau sélectionné
-//     setFormData((prevData) => {
-//       const updatedFormData = { ...prevData };
-
-//       // Vérifier si le réseau est WhatsApp ou Telegram
-//       if (network === "whatsapp") {
-//         updatedFormData.postulant.for_whatsapp = !isSelected;
-//       } else if (network === "telegram") {
-//         updatedFormData.postulant.for_telegram = !isSelected;
-//       } else {
-//         // Gestion des autres réseaux sociaux dynamiquement
-//         updatedFormData.postulant.for_other = {
-//           ...updatedFormData.postulant.for_other, 
-//           [network]: !isSelected,
-//         };
-//       }
-
-//       return updatedFormData;
-//     });
-
-//     // Gérer la sélection unique (un seul réseau sélectionné à la fois)
-//     return isSelected ? [] : [id];
-//   });
  
-// };
-
 const handleCheckboxChange_R = (id, network) => {
-  console.log("handledata");
-console.log(id)
-console.log(network)
-console.log(selectedOptions_rx)
+  
   if (selectedOptions_rx.includes(network)) {
     // Désélectionner l'option
     setSelectedOptions_rx([]);
@@ -250,22 +165,9 @@ const handlePlusClick_rx = (e) => {
     }
   }
 };
-
-console.log("dropdownDirection")
-console.log(dropdownDirection)
-
+ 
 useEffect(() => {}, [dropdownDirection]);
 
-// const handlePlusClick_rx = (e) => {
-//   e.preventDefault(); // Empêche la soumission du formulaire
-//   setIsOpen_rx(!isOpen_rx); // Toggle l'état ouvert/fermé du dropdown
-// };
-
-// Fonction pour afficher le texte du bouton selon les catégories sélectionnées
-const getButtonText_rx = () => {
-  // Retourne le texte du bouton avec le "+"
-  return "";
-};
 
 
      // Fermer le menu si on clique en dehors
@@ -281,18 +183,8 @@ const getButtonText_rx = () => {
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
       }, []);
-    
-  const options_more = [
-    { value: "", label: "Autres" },
-    { value: "signal", label: "Signal" },
-    { value: "viber", label: "Viber" }
-  ];
-
+      
   
-    const [selectedCategories_extra, setSelectedCategories_extra] = useState([1, 2, 3]); // Par défaut, tout est sélectionné
-    // const [calendarDays, setCalendarDays] = useState([]);
-  
-  // Gérer le clic en dehors pour fermer le dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef_more.current && !dropdownRef_more.current.contains(event.target)) {
@@ -305,20 +197,7 @@ const getButtonText_rx = () => {
     };
   }, []);
 
-  const handleSelect_more = (value) => {
-    setSelectedOption_more(value);
-    setIsOpen_more(false); // Fermer le dropdown après sélection
-  };
-      const auth = useAuth(); 
-      const user_info = auth.currentUser 
-      const [newSave, setNewSave] = useState(0);
-      const [contacter_afrodites, setContacter_afrodites] = useState(0);
-
-      const [date, setDate] = useState({ day: "", month: "", year: "" });
-      const dayRef = useRef(null);
-      const monthRef = useRef(null);
-      const yearRef = useRef(null);
-
+     
       const handleChange_setdate = (e) => {
         const { name, value } = e.target;
         if (!/^\d*$/.test(value)) return; // Bloque les caractères non numériques
@@ -340,7 +219,7 @@ const getButtonText_rx = () => {
         }
       };
     
-      console.log(date)
+      // console.log(date)
     const [formData, setFormData] = useState({
       postulant: {
         nom: "",
@@ -473,41 +352,32 @@ const getButtonText_rx = () => {
       }));
     }
   }, [date, setFormData]);
-    console.log("formData")
-    console.log(formData)
-        useEffect(() => {
-   
-        const userid = user_info?.id;
-          const params = { userid };
-      
-          const fetchData = async () => {
-            try {
-                if (userid != undefined) {
-
-                 
-                  // récupérer les infos de postulant
-    const dataPostulant = await axios.post(`${apiUrl}/postulant/etatcandidature`, params);
-    console.log("dataPostulant")                  
-    console.log(dataPostulant)
-            if((dataPostulant.data.length > 0) && (newSave === 0)){
-
-                   navigate("/etatcandidature"); // Redirection si aucune donnée
-             
-             }
-
-                  // return false;
-               
-              } 
-              // setLoading(false);
-            } catch (err) {
-              console.error("Erreur lors de la récupération des données :", err);
-              setLoading(false);
-            }
-          };
-      
-          fetchData();
-        }, [user_info]);
-  const link_url = location?.pathname.split("/");
+  useEffect(() => {
+    const userid = user_info?.id;
+    const params = { userid };
+  
+    const fetchData = async () => {
+      try {
+        if (userid !== undefined) {
+          const dataPostulant = await axios.post(`${apiUrl}/postulant/etatcandidature`, params);
+          console.log("dataPostulant");
+          console.log(dataPostulant);
+  
+          if (dataPostulant.data.length > 0 && newSave === 0) {
+            router.push('/etatcandidature'); // ✅ Redirection Next.js
+          }
+        }
+      } catch (err) {
+        console.error("Erreur lors de la récupération des données :", err);
+        setLoading(false); // Assure-toi que `setLoading` est bien défini dans le composant
+      }
+    };
+  
+    fetchData();
+  }, [user_info]);
+  
+       
+  // const link_url = location?.pathname.split("/");
   const categoryMap = {
     1: "mannequin",
     2: "hoteHotesse",
@@ -549,12 +419,7 @@ const getButtonText_rx = () => {
     e.preventDefault();  // Empêche la soumission du formulaire
     setShowOptions(!showOptions);
   };
-  // const [selectedCode, setSelectedCode] = useState("");
-  // const [phoneNumber, setPhoneNumber] = useState("");
-  // const [whatsapp, setWhatsapp] = useState(false);
-  // const [telegram, setTelegram] = useState(false);
-  // const [extraChecked, setExtraChecked] = useState(false);
-
+ 
   const countryCodes = [
     {name : "tg" , code: "+228"},
     { name: "fr", code: "+33" },
@@ -670,11 +535,6 @@ const getButtonText_rx = () => {
     // Mise à jour des données du formulaire
     handleCheckboxChange_phone(selectedNetwork);
   };
-  // const handleSelectChange = (e) => {
-  //   setExtraOption(e.target.value);
-  //   handleCheckboxChange_phone(e.target.value)
-  //   // setExtraChecked(true); // Coche automatiquement la case quand on sélectionne une option
-  // };
 
   const handleCheckboxChange_extra = () => {
     if (extraChecked) {
@@ -684,15 +544,8 @@ const getButtonText_rx = () => {
       setExtraChecked(true);
     }
   };
-  // const handleSelectChange = (event) => {
-  //   const selected = event.target.value;
-  //   setExtraOption(selected);
-  //   setExtraChecked(true);
-  // };
-  // const mannequin_list = {
-  //   "catwalk" , "podium" , "detail" ,  "test",
-   
-  // }
+  
+  
 const categories = {
   "form_mannequinnat": [
     "former_marche",
@@ -760,10 +613,7 @@ const categories = {
 // Gérer la sélection des catégories
 const handleCategoryChange = (category) => {
 
-  // console.log("formData.formation:", formData.formation);
-
-  // console.log("category")
-  // console.log(category)
+  
   setSelectedCategories((prev) =>
     prev.includes(category)
       ? prev.filter((c) => c !== category)
@@ -853,59 +703,7 @@ const handleCheckboxChange_c = (categoryType, category) => {
     },
   }));
 };
-
-
-// const handleCategoryChange_b = (category , sub_categ) => {
-
-//   console.log("formData.formation:", formData.formation);
-
-//   console.log(category)
-//   console.log(sub_categ)
-
-//   setFormData((prevData) => {
-//     const formationCopy = [...prevData.formation];
-//     const categoryIndex = formationCopy.findIndex((item) => item.category === category);
-
-//     if (categoryIndex !== -1) {
-//       let subCategories = formationCopy[categoryIndex].subCategories;
-
-//       if (subCategories.includes(sub_categ)) {
-//         // Supprimer la sous-catégorie si elle est déjà présente
-//         subCategories = subCategories.filter((sc) => sc !== sub_categ);
-//       } else {
-//         // Ajouter la sous-catégorie
-//         subCategories = [...subCategories, sub_categ];
-//       }
-
-//       // Mettre à jour la catégorie dans le tableau
-//       formationCopy[categoryIndex] = { ...formationCopy[categoryIndex], subCategories };
-
-//       return { ...prevData, formation: formationCopy };
-//     }
-
-//     return prevData;
-//   });
-
-//   // setSelectedCategories((prev) =>
-//   //   prev.includes(category)
-//   //     ? prev.filter((c) => c !== category)
-//   //     : [...prev, category]
-//   // );
-
-//   // setFormData((prevData) => ({
-//   //   ...prevData,
-//   //   formation: prevData.formation.includes(category)
-//   //     ? prevData.formation.filter((c) => c !== category)
-//   //     : [...prevData.formation, category],
-//   //   subFormation: {
-//   //     ...prevData.subFormation,
-//   //     [category]: prevData.subFormation?.[category]?.includes(sub_categ)
-//   //       ? prevData.subFormation[category].filter((sc) => sc !== sub_categ)
-//   //       : [...(prevData.subFormation?.[category] || []), sub_categ],
-//   //   },
-//   // })); 
-// };
-
+ 
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
    
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -1021,7 +819,7 @@ const handleCheckboxChange_c = (categoryType, category) => {
   });
 
   useEffect(() => {
-    const category = categoryMap[link_url[2]];
+    const category = categoryMap[searchParams];
     if (category) {
       setSelectedTypes((prevState) => ({
         ...prevState,
@@ -1032,7 +830,7 @@ const handleCheckboxChange_c = (categoryType, category) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const category = parseInt(link_url[2], 10);
+      const category = parseInt(searchParams, 10);
       const userid = 1; // Replace with actual user ID
       const params = { userid, categ: category };
 
@@ -4071,7 +3869,7 @@ onChange={(e) => setcode_pays(e.target.value)} />
                                                                                       {zone === "face" ?
                                                                                       (
                                                                                         <span className="person_icon"> 
-                                                                                             <img src= {face_image} alt={zone} />
+                                                                                             <img src= "/assets/icone_person/face.webp" alt={zone} />
                                                                                       </span>
             
                                                                                       )
@@ -4079,7 +3877,7 @@ onChange={(e) => setcode_pays(e.target.value)} />
                                                                                       zone === "profile" ?
                                                                                       (
                                                                                         <span className="person_icon"> 
-                                                                                          <img src= {profil_image} alt={zone} />
+                                                                                          <img src= "/assets/icone_person/profil.webp" alt={zone} />
                                                                                         </span>
                                                                                         
                                                                                       )
@@ -4087,7 +3885,7 @@ onChange={(e) => setcode_pays(e.target.value)} />
                                                                                       zone === "entier" &&
                                                                                       (
                                                                                         <span className="person_icon">  
-                                                                                           <img src= {plain_pied_image} alt={zone} className="illustrate" />
+                                                                                           <img src= "/assets/icone_person/pp.webp" alt={zone} className="illustrate" />
                                                                                        
                                                                                           </span>
                                                                                        

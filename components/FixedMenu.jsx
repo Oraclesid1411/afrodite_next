@@ -238,7 +238,7 @@ const tabs = [
   }
   ,
   {
-    link: "/evenements",
+    link: "/evenements/calendar",
     icon: faCalendar,
     label: "Events",
     // onClick: () => handleOpenModal('modal_1'), // Ouvrir le modal 1
@@ -495,7 +495,7 @@ useEffect(() => {
 </li>
 
                                     <li className="menu-list-item nav-item">
-                                        <a className="nav-link" href="/evenements">Events</a>
+                                        <a className="nav-link" href="/evenements/calendar">Events</a>
                                     </li>
                                     <li className="menu-list-item nav-item">
                                         <a className="nav-link" href="/franchises">Franchises</a>
