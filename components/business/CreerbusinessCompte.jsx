@@ -15,7 +15,7 @@ import { faPhone, faAnglesRight } from '@fortawesome/free-solid-svg-icons';
 import { FaWhatsapp, FaTelegram } from "react-icons/fa";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Locations from '../../Components/Locations_models';
+import Locations from '../locations/Locations_models.jsx';
 // import Locations from './Components/Locations_models';
 import axios from 'axios' 
 import { motion } from "framer-motion";
@@ -25,7 +25,7 @@ function Business() {
   const pathname = usePathname();     // équivalent de location.pathname
   const searchParams = useSearchParams(); // équivalent de location.search
      
-  const auth = useAuth(); 
+           const auth = useAuth(); 
            const user_info = auth.currentUser; 
            const [auth_Ids, setAuth_ids] = useState({
             auth: {
@@ -40,30 +40,15 @@ function Business() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [phoneNumber_b, setPhoneNumber_b] = useState("");
   const [afrodites_services, setAfrodites_services] = useState("");
-//   const [code_pays, setcode_pays] = useState("+228");
-    //  const [selectedCategories_rx, setSelectedCategories_rx] = useState([]); // Liste des catégories sélectionnées
+
        const [isOpen_rx, setIsOpen_rx] = useState(false); // Etat pour gérer l'ouverture/fermeture du dropdown
        const dropdownRef_rx = useRef(null);
        const [isOpen_rx_b, setIsOpen_rx_b] = useState(false); // Etat pour gérer l'ouverture/fermeture du dropdown
        const dropdownRef_rx_b = useRef(null);
 
-       const apiUrl = 'https://apiafro.aafrodites.com'
+      //  const apiUrl = 'https://apiafro.aafrodites.com'
   
-      //  const formatServiceData = (rawData) => {
-      //   const result = {};
-      //   rawData.forEach(item => {
-      //     const id = item.id_services;
-      //     if (!result[id]) {
-      //       result[id] = {
-      //         libelle: item.libelle,
-      //         subcategories: []
-      //       };
-      //     }
-      //     result[id].subcategories.push(item.sous_serv_libelle);
-      //   });
-      //   return result;
-      // };
-
+      
       const formatServiceData = (rawData) => {
         const result = {};
         rawData.forEach(item => {
@@ -82,7 +67,7 @@ function Business() {
         return result;
       };
       
-      // const closeMsg = () => setisSucess(false);
+    
       const closeMsg = () => {
         setisSucess(false);
         navigate("/profile"); // remplace par le chemin voulu
@@ -170,84 +155,8 @@ function Business() {
           }
           
       });
+   
       
-//   const [formData, setFormData] = useState({
-//     representative: {
-//       firstName: "",
-//       lastName: "",
-//       position: "",
-//       email: "",
-//       telephone: "",
-//       indicatif_phone: "",
-//       whatsapp: "", 
-      
-//       for_whatsapp : false,
-//        indicatif_telegram: "",
-//        telegram: "",
-//        for_telegram : false,
-//        pays: "",
-//        ville: "",
-//       indication:"",  
-//     },
-//     business: {
-//       companyName: "",
-//       registrationNumber: "",
-//       type : "",
-//       taxId: "",
-//       email: "",
-//       telephone: "",
-//       indicatif_phone: "",
-//       whatsapp: "", 
-//       for_whatsapp : false,
-//        indicatif_telegram: "",
-//        telegram: "",
-//        for_telegram : false,
-    
-//       website: "",
-//       pays: "",
-//        ville: "",
-//       indication:"",
-//       address: {
-//         pays: "",
-//         ville: "",
-//       }
-//     },
-//     services: {
-//       modelCasting: false,
-//       photoShooting: false,
-//       eventHosting: false,
-//       influencerMarketing: false,
-//       brandAmbassador: false,
-//       fashionShow: false,
-//     }
-//   });
-//   const serviceOptions = {
-//     modelCasting: {
-//       label: "Casting de mannequins",
-//       subcategories: ["Débutant", "Professionnel", "Enfants"]
-//     },
-//     photoShooting: {
-//       label: "Séances photo professionnelles",
-//       subcategories: ["Mode", "Produit", "Corporate"]
-//     },
-//     eventHosting: {
-//       label: "Hôtesses pour événements",
-//       subcategories: ["Salon", "Mariage", "Soirée VIP"]
-//     },
-//     influencerMarketing: {
-//       label: "Marketing d'influence",
-//       subcategories: ["Instagram", "TikTok", "YouTube"]
-//     },
-//     brandAmbassador: {
-//       label: "Ambassadeurs de marque",
-//       subcategories: ["Cosmétiques", "Mode", "Technologie"]
-//     },
-//     fashionShow: {
-//       label: "Organisation de défilés",
-//       subcategories: ["Haute couture", "Prêt-à-porter", "Streetwear"]
-//     }
-//   };
-
 console.log("afrodites_services")
 console.log(afrodites_services)
 const serviceOptions = {

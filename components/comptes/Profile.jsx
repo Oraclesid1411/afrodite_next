@@ -113,7 +113,7 @@ const closeModal_form = () => {
 
   return (
     <>
-            <Header_menu data_props={{ title: 'Profil' }} data_page={{ type: "comptes", back_option: "on" }} />
+            {/* <Header_menu data_props={{ title: 'Profil' }} data_page={{ type: "comptes", back_option: "on" }} /> */}
 
       <div className="main_container px-2 user_profil_container">
         <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -206,13 +206,15 @@ const closeModal_form = () => {
                </div>
               </div>
             ) : (
-              <CandidatureForm selectedCategory={modalData.category} />
+              <>
+              </>
+              // <CandidatureForm selectedCategory={modalData.category} />
             )}
           </motion.div>
         </div>
       )}
 
-      <FixedMenu />
+      {/* <FixedMenu /> */}
     </>
   );
 };
