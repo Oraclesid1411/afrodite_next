@@ -1,16 +1,13 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
+import CreerbusinessCompte from '../../components/business/CreerbusinessCompte';
 
 export default function CreerCompteBusinessPage() {
   const searchParams = useSearchParams();
   const demande = searchParams.get('demande');
 
   return (
-    <div className="p-4">
-      <h1>Créer un compte Business</h1>
-      <p>Demande : {demande}</p>
-      {/* Contenu pour engager une Afrodite */}
-    </div>
+    <CreerbusinessCompte />
   );
 }

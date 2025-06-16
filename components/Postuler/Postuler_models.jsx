@@ -39,10 +39,10 @@ import { Tooltip } from "react-tooltip";
 
 import Locations from '../../Components/Locations_models.jsx';
 // import CountrySelector from "../../Components/CountrySelector.jsx";
-
+import {apiUrl} from "../../config/apiUrl.js"
 
 function PostulerModels() {
-       const apiUrl = "https://apiafro.aafrodites.com";
+      //  const apiUrl = "https://apiafro.aafrodites.com";
        const router = useRouter();         // remplace useNavigate()
        const pathname = usePathname();     // équivalent de location.pathname
        const searchParams = useSearchParams(); // équivalent de location.search
@@ -788,9 +788,10 @@ const handleCheckboxChange_c = (categoryType, category) => {
   
     // Gérer les changements de sélection
   
-    const handleBackClick = () => {
-      navigate(-1);  // Retourne à la page précédente  // Retourne à la page précédente
-    };
+  
+const handleBackClick = () => {
+  router.back(); // ✅ Retourne à la page précédente
+};
   
      
     const handleLocationChange = (data) => {
@@ -3584,7 +3585,8 @@ Yoga et relaxation
 <input type="text" 
 className="indicatif input_padding" 
 placeholder="code"
-value={code_pays} 
+value={code_pays || ''}
+// value={code_pays} 
 onChange={(e) => setcode_pays(e.target.value)} />
 
 </div>

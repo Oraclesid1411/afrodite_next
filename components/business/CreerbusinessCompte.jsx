@@ -2,17 +2,16 @@
 
 import React, { useState ,useRef,useEffect } from 'react';
 
+import {apiUrl} from "../../config/apiUrl.js"
 import moment from 'moment';
 import requestPermission from '../../sevices/NotificationService.js';
 import { useAuth } from "../../Context/AuthenticateContext.jsx";
-import { FaChevronLeft } from 'react-icons/fa';
-// import { useNavigate , useLocation } from 'react-router-dom';
+import { FaChevronLeft } from 'react-icons/fa'; 
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
-import {apiUrl} from "../../config/apiUrl.js"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPhone, faPlus , faAnglesRight } from '@fortawesome/free-solid-svg-icons';
+import { faPhone, faAnglesRight } from '@fortawesome/free-solid-svg-icons';
 import { FaWhatsapp, FaTelegram } from "react-icons/fa";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -21,13 +20,13 @@ import Locations from '../../Components/Locations_models';
 import axios from 'axios' 
 import { motion } from "framer-motion";
 
-function Create_franchise() {
-  // const navigate = useNavigate();
+function Business() {
   const router = useRouter();         // remplace useNavigate()
   const pathname = usePathname();     // équivalent de location.pathname
   const searchParams = useSearchParams(); // équivalent de location.search
+     
   const auth = useAuth(); 
-       const user_info = auth.currentUser; 
+           const user_info = auth.currentUser; 
            const [auth_Ids, setAuth_ids] = useState({
             auth: {
               pseudo: "",
@@ -47,56 +46,10 @@ function Create_franchise() {
        const dropdownRef_rx = useRef(null);
        const [isOpen_rx_b, setIsOpen_rx_b] = useState(false); // Etat pour gérer l'ouverture/fermeture du dropdown
        const dropdownRef_rx_b = useRef(null);
-       const dropdownRef_postes = useRef(null);
-      
-      //  const apiUrl = 'https://apiafro.aafrodites.com'
-       
-       const [fileName, setFileName] = useState("");
-       const [cv, setcv] = useState("");
-       const [postes, setPostes] = useState([]);
-       const [selectedPoste, setSelectedPoste] = useState(null);
-       const [searchTerm, setSearchTerm] = useState("");
-       const [isOpen_poste_box, setIsOpen_poste_box] = useState(false);
-       const [demande, setDemande] = useState(false);
 
-       useEffect(() => {
-        const fetchData = async () => {
-         
-          try {
-            // setLoading(true); // Active le loader
-           
-                const get_demande = await axios
-                .post(`${apiUrl}/franchises/getdemande` ,
-                   {user :user_info?.id}
-                  );
-                   console.log("get_demande")
-                   console.log(get_demande)
-                      if(get_demande?.data.length > 0){
-                        setDemande(true)
-                      }
-                  
-                  //  setPostes(rep1.data);
-           
-          } catch (err) {
-            console.log(err);
-          
-          }finally {
-            console.log("end of operation")
-            // setLoading(false); // Désactive le loader
-          }
-        };
-        fetchData();
-      } , []);
-
-      //   const handleFileChange = (e) => {
-      //    const file = e.target.files[0];
-      //    setcv(file)
-      //    if (file) {
-      //      setFileName(file.name);
-      //    }
-      //  };
-    
-      // const formatServiceData = (rawData) => {
+       const apiUrl = 'https://apiafro.aafrodites.com'
+  
+      //  const formatServiceData = (rawData) => {
       //   const result = {};
       //   rawData.forEach(item => {
       //     const id = item.id_services;
@@ -106,19 +59,33 @@ function Create_franchise() {
       //         subcategories: []
       //       };
       //     }
-      //     result[id].subcategories.push({
-      //       id: item.sous_serv_afro,
-      //       libelle: item.sous_serv_libelle
-      //     });
+      //     result[id].subcategories.push(item.sous_serv_libelle);
       //   });
       //   return result;
       // };
+
+      const formatServiceData = (rawData) => {
+        const result = {};
+        rawData.forEach(item => {
+          const id = item.id_services;
+          if (!result[id]) {
+            result[id] = {
+              libelle: item.libelle,
+              subcategories: []
+            };
+          }
+          result[id].subcategories.push({
+            id: item.sous_serv_afro,
+            libelle: item.sous_serv_libelle
+          });
+        });
+        return result;
+      };
       
       // const closeMsg = () => setisSucess(false);
       const closeMsg = () => {
         setisSucess(false);
-        router.push('/profile')
-        // navigate("/profile"); // remplace par le chemin voulu
+        navigate("/profile"); // remplace par le chemin voulu
       };
        useEffect(() => {
         const fetchData = async () => {
@@ -126,12 +93,12 @@ function Create_franchise() {
           try {
             // setLoading(true); // Active le loader
            
-                const rep1 = await axios.get(`${apiUrl}/data/postes`);
+                const rep1 = await axios.get(`${apiUrl}/afrodites_services/all_sous_services`);
                    console.log("rep1")
                    console.log(rep1)
 
                   
-                   setPostes(rep1.data);
+                 setAfrodites_services(formatServiceData(rep1.data));
            
           } catch (err) {
             console.log(err);
@@ -143,36 +110,17 @@ function Create_franchise() {
         };
         fetchData();
       } , []);
-
-      const handleSelect = (poste) => {
-        setSelectedPoste(poste);
-        setSearchTerm(poste.libelle);
-        setIsOpen_poste_box(false);
-
-        setFormData((prevData) => ({
-          ...prevData,
-          representative: {
-            ...prevData.representative,
-            position: poste?.id,
-          },
-        }));
-      };
-    
-      const filteredPostes = postes.filter((poste) =>
-        poste.libelle.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-     
     //    récupérer liste des services d'afrodites
-    // const initServices = (formatted) => {
-    //     const state = {};
-    //     Object.keys(formatted).forEach((id) => {
-    //       state[id] = {
-    //         active: false,
-    //         selected: []
-    //       };
-    //     });
-    //     return state;
-    //   };
+    const initServices = (formatted) => {
+        const state = {};
+        Object.keys(formatted).forEach((id) => {
+          state[id] = {
+            active: false,
+            selected: []
+          };
+        });
+        return state;
+      };
       
 
        const [formData, setFormData] = useState({
@@ -192,12 +140,88 @@ function Create_franchise() {
           ville: "",
           indication: ""  
         },
-           
+        business: {
+          companyName: "",
+          registrationNumber: "",
+          type: "",
+          taxId: "",
+          email: "",
+          telephone: "",
+          indicatif_phone: "",
+          whatsapp: "", 
+          for_whatsapp: false,
+          indicatif_telegram: "",
+          telegram: "",
+          for_telegram: false,
+          website: "",
+          pays: "",
+          ville: "",
+          indication: "",
+          address: {
+            pays: "",
+            ville: ""
+          }
+        },
+        services: {
+            1: { active: false, selected: [] },
+            2: { active: false, selected: [] },
+            3: { active: false, selected: [] },
+            4: { active: false, selected: [] },
+          }
+          
       });
-   
-// console.log("afrodites_services")
-// console.log(afrodites_services)
-// const serviceOptions = {
+      
+//   const [formData, setFormData] = useState({
+//     representative: {
+//       firstName: "",
+//       lastName: "",
+//       position: "",
+//       email: "",
+//       telephone: "",
+//       indicatif_phone: "",
+//       whatsapp: "", 
+      
+//       for_whatsapp : false,
+//        indicatif_telegram: "",
+//        telegram: "",
+//        for_telegram : false,
+//        pays: "",
+//        ville: "",
+//       indication:"",  
+//     },
+//     business: {
+//       companyName: "",
+//       registrationNumber: "",
+//       type : "",
+//       taxId: "",
+//       email: "",
+//       telephone: "",
+//       indicatif_phone: "",
+//       whatsapp: "", 
+//       for_whatsapp : false,
+//        indicatif_telegram: "",
+//        telegram: "",
+//        for_telegram : false,
+    
+//       website: "",
+//       pays: "",
+//        ville: "",
+//       indication:"",
+//       address: {
+//         pays: "",
+//         ville: "",
+//       }
+//     },
+//     services: {
+//       modelCasting: false,
+//       photoShooting: false,
+//       eventHosting: false,
+//       influencerMarketing: false,
+//       brandAmbassador: false,
+//       fashionShow: false,
+//     }
+//   });
+//   const serviceOptions = {
 //     modelCasting: {
 //       label: "Casting de mannequins",
 //       subcategories: ["Débutant", "Professionnel", "Enfants"]
@@ -223,40 +247,118 @@ function Create_franchise() {
 //       subcategories: ["Haute couture", "Prêt-à-porter", "Streetwear"]
 //     }
 //   };
-  
-  
-// const toggleService = (id) => {
-//   setFormData(prev => ({
-//     ...prev,
-//     services: {
-//       ...prev.services,
-//       [id]: {
-//         ...prev.services[id],
-//         active: !prev.services[id]?.active,
-//         selected: !prev.services[id]?.active ? prev.services[id]?.selected : []
-//       }
-//     }
-//   }));
-// };
 
-// const toggleSubcategory = (serviceId, subId) => {
-//   setFormData(prev => {
-//     const selected = prev.services[serviceId].selected;
-//     const updated = selected.includes(subId)
-//       ? selected.filter(id => id !== subId)
-//       : [...selected, subId];
-//     return {
+console.log("afrodites_services")
+console.log(afrodites_services)
+const serviceOptions = {
+    modelCasting: {
+      label: "Casting de mannequins",
+      subcategories: ["Débutant", "Professionnel", "Enfants"]
+    },
+    photoShooting: {
+      label: "Séances photo professionnelles",
+      subcategories: ["Mode", "Produit", "Corporate"]
+    },
+    eventHosting: {
+      label: "Hôtesses pour événements",
+      subcategories: ["Salon", "Mariage", "Soirée VIP"]
+    },
+    influencerMarketing: {
+      label: "Marketing d'influence",
+      subcategories: ["Instagram", "TikTok", "YouTube"]
+    },
+    brandAmbassador: {
+      label: "Ambassadeurs de marque",
+      subcategories: ["Cosmétiques", "Mode", "Technologie"]
+    },
+    fashionShow: {
+      label: "Organisation de défilés",
+      subcategories: ["Haute couture", "Prêt-à-porter", "Streetwear"]
+    }
+  };
+  
+//   const handleSubcategoryToggle = (categoryKey, subcategory) => {
+//     setFormData((prev) => {
+//       const current = prev.services[categoryKey] || [];
+//       const updated = current.includes(subcategory)
+//         ? current.filter((item) => item !== subcategory)
+//         : [...current, subcategory];
+  
+//       return {
+//         ...prev,
+//         services: {
+//           ...prev.services,
+//           [categoryKey]: updated
+//         }
+//       };
+//     });
+//   };
+    
+// const toggleService = (id) => {
+//     setFormData(prev => ({
 //       ...prev,
 //       services: {
 //         ...prev.services,
-//         [serviceId]: {
-//           ...prev.services[serviceId],
-//           selected: updated
+//         [id]: {
+//           ...prev.services[id],
+//           active: !prev.services[id].active,
+//           selected: !prev.services[id].active ? prev.services[id].selected : []
 //         }
 //       }
-//     };
-//   });
-// };
+//     }));
+//   };
+  
+//   const toggleSubcategory = (id, sub) => {
+//     setFormData(prev => {
+//       const selected = prev.services[id].selected;
+//       const updated = selected.includes(sub)
+//         ? selected.filter(s => s !== sub)
+//         : [...selected, sub];
+//       return {
+//         ...prev,
+//         services: {
+//           ...prev.services,
+//           [id]: {
+//             ...prev.services[id],
+//             selected: updated
+//           }
+//         }
+//       };
+//     });
+//   };
+  
+const toggleService = (id) => {
+  setFormData(prev => ({
+    ...prev,
+    services: {
+      ...prev.services,
+      [id]: {
+        ...prev.services[id],
+        active: !prev.services[id]?.active,
+        selected: !prev.services[id]?.active ? prev.services[id]?.selected : []
+      }
+    }
+  }));
+};
+
+const toggleSubcategory = (serviceId, subId) => {
+  setFormData(prev => {
+    const selected = prev.services[serviceId].selected;
+    const updated = selected.includes(subId)
+      ? selected.filter(id => id !== subId)
+      : [...selected, subId];
+    return {
+      ...prev,
+      services: {
+        ...prev.services,
+        [serviceId]: {
+          ...prev.services[serviceId],
+          selected: updated
+        }
+      }
+    };
+  });
+};
 
     useEffect(() => {
      
@@ -271,21 +373,7 @@ function Create_franchise() {
    
        return () => document.removeEventListener("mousedown", handleClickOutside_rx);
     }, []);
- 
-    useEffect(() => {
-     
-      const handleClickOutside_poste = (event) => {
-        if (dropdownRef_postes.current && !dropdownRef_postes.current.contains(event.target)) {
-          setIsOpen_poste_box(false);
-        }
-        
-      };
   
-      document.addEventListener("mousedown", handleClickOutside_poste);
-   
-       return () => document.removeEventListener("mousedown", handleClickOutside_poste);
-    }, []);
- 
     useEffect(() => {
       
      
@@ -300,20 +388,20 @@ function Create_franchise() {
         return () => document.removeEventListener("mousedown", handleClickOutside_rx_b);
       }, []);
     
-      // const prepareServicesForSubmission = () => {
-      //   const result = [];
-      //   Object.entries(formData.services).forEach(([serviceId, { active, selected }]) => {
-      //     if (active) {
-      //       selected.forEach(subId => {
-      //         result.push({
-      //           serviceId: parseInt(serviceId),
-      //           subServiceId: subId
-      //         });
-      //       });
-      //     }
-      //   });
-      //   return result;
-      // };
+      const prepareServicesForSubmission = () => {
+        const result = [];
+        Object.entries(formData.services).forEach(([serviceId, { active, selected }]) => {
+          if (active) {
+            selected.forEach(subId => {
+              result.push({
+                serviceId: parseInt(serviceId),
+                subServiceId: subId
+              });
+            });
+          }
+        });
+        return result;
+      };
       
    // Gestion du changement de téléphone
    const handlePhoneChange = (e) => {
@@ -329,18 +417,18 @@ function Create_franchise() {
     }));
   };
 
-  // const handlePhoneChange_b = (e) => {
-  //   const value = e.target.value;
-  //   setPhoneNumber_b(value);
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     business: {
-  //       ...prev.business,
-  //       // indicatif_phone: "00" + phone_ind,
-  //       telephone: value,
-  //     },
-  //   }));
-  // };
+  const handlePhoneChange_b = (e) => {
+    const value = e.target.value;
+    setPhoneNumber_b(value);
+    setFormData((prev) => ({
+      ...prev,
+      business: {
+        ...prev.business,
+        // indicatif_phone: "00" + phone_ind,
+        telephone: value,
+      },
+    }));
+  };
 
 
 // Liste des catégories d'options disponibles
@@ -360,13 +448,13 @@ useEffect(() => {
 }, []);
 
 
-// const categoriesList_rx_b = [
-//     { id: "whatsapp",ids: "whatsapp_id", label: "WhatsApp", icon: <FaWhatsapp className="text-green-500 ml-2" /> },
-//     { id: "telegram",ids: "telegram_id", label: "Telegram", icon: <FaTelegram className="text-blue-500 ml-2" /> },
-//     { id: "signal",ids: "signal_id", label: "Signal", icon: <img src="/assets/img/msg/signal.jpeg" className="brand_icon" alt="Signal" /> },
-//     { id: "viber",ids: "viber_id", label: "Viber", icon: <img src="/assets/img/msg/viber.jpeg" className="brand_icon" alt="Viber" /> }
+const categoriesList_rx_b = [
+    { id: "whatsapp",ids: "whatsapp_id", label: "WhatsApp", icon: <FaWhatsapp className="text-green-500 ml-2" /> },
+    { id: "telegram",ids: "telegram_id", label: "Telegram", icon: <FaTelegram className="text-blue-500 ml-2" /> },
+    { id: "signal",ids: "signal_id", label: "Signal", icon: <img src="/assets/img/msg/signal.jpeg" className="brand_icon" alt="Signal" /> },
+    { id: "viber",ids: "viber_id", label: "Viber", icon: <img src="/assets/img/msg/viber.jpeg" className="brand_icon" alt="Viber" /> }
   
-//   ];
+  ];
   
   const [selectedOptions_rx_b, setSelectedOptions_rx_b] = useState([]);
   const [dropdownDirection_b, setDropdownDirection_b] = useState("right");
@@ -448,79 +536,78 @@ const handleCheckboxChange_R = (id, network) => {
   
 
   
-// const handleCheckboxChange_B = (id, network) => {
-//     console.log("handledata");
-//   console.log(id)
-//   console.log(network)
-//   console.log(selectedOptions_rx_b)
-//     if (selectedOptions_rx_b.includes(network)) {
-//       // Désélectionner l'option
-//       setSelectedOptions_rx_b([]);
-//       setFormData((prevData) => {
-//         const updatedFormData = { ...prevData };
-//         if (network === "whatsapp") {
-//           updatedFormData.business.for_whatsapp = false;
-//         } else if (network === "telegram") {
-//           updatedFormData.business.for_telegram = false;
-//         } else {
-//           updatedFormData.business.for_other = {
-//             ...updatedFormData.business.for_other,
-//             [network]: false,
-//           };
-//         }
-//         return updatedFormData;
-//       });
-//     } else {
-//       // Sélectionner uniquement cette option
-//       setSelectedOptions_rx_b([network]);
-//       setFormData((prevData) => {
-//         const updatedFormData = { ...prevData };
-//         if (network === "whatsapp") {
-//           updatedFormData.business.for_whatsapp = true;
-//         } else if (network === "telegram") {
-//           updatedFormData.business.for_telegram = true;
-//         } else {
-//           updatedFormData.business.for_other = {
-//             ...updatedFormData.business.for_other,
-//             [network]: true,
-//           };
-//         }
-//         return updatedFormData;
-//       });
-//     }
-//   };
+const handleCheckboxChange_B = (id, network) => {
+    console.log("handledata");
+  console.log(id)
+  console.log(network)
+  console.log(selectedOptions_rx_b)
+    if (selectedOptions_rx_b.includes(network)) {
+      // Désélectionner l'option
+      setSelectedOptions_rx_b([]);
+      setFormData((prevData) => {
+        const updatedFormData = { ...prevData };
+        if (network === "whatsapp") {
+          updatedFormData.business.for_whatsapp = false;
+        } else if (network === "telegram") {
+          updatedFormData.business.for_telegram = false;
+        } else {
+          updatedFormData.business.for_other = {
+            ...updatedFormData.business.for_other,
+            [network]: false,
+          };
+        }
+        return updatedFormData;
+      });
+    } else {
+      // Sélectionner uniquement cette option
+      setSelectedOptions_rx_b([network]);
+      setFormData((prevData) => {
+        const updatedFormData = { ...prevData };
+        if (network === "whatsapp") {
+          updatedFormData.business.for_whatsapp = true;
+        } else if (network === "telegram") {
+          updatedFormData.business.for_telegram = true;
+        } else {
+          updatedFormData.business.for_other = {
+            ...updatedFormData.business.for_other,
+            [network]: true,
+          };
+        }
+        return updatedFormData;
+      });
+    }
+  };
   
-//   const handlePlusClick_rx_B = (e) => {
+  const handlePlusClick_rx_B = (e) => {
   
-//     e.preventDefault(); // Empêche la soumission du formulaire
+    e.preventDefault(); // Empêche la soumission du formulaire
   
-//     setIsOpen_rx_b(!isOpen_rx_b);
+    setIsOpen_rx_b(!isOpen_rx_b);
   
-//     if (dropdownRef_rx_b.current) {
+    if (dropdownRef_rx_b.current) {
   
       
-//     // alert('test')
+    // alert('test')
   
-//       const dropdownRect = dropdownRef_rx_b.current.getBoundingClientRect();
-//       const windowWidth = window.innerWidth;
-//       // alert(windowWidth)
-//       console.log("Dropdown position:", dropdownRect.right);
+      const dropdownRect = dropdownRef_rx_b.current.getBoundingClientRect();
+      const windowWidth = window.innerWidth;
+      // alert(windowWidth)
+      console.log("Dropdown position:", dropdownRect.right);
     
-//       console.log("Window width:", windowWidth);
+      console.log("Window width:", windowWidth);
    
-//       if (dropdownRect.right + 80 > windowWidth) {
-//         console.log("Switching to left");
-//         setDropdownDirection_b("left");
-//       } else {
-//         console.log("Keeping right");
-//         setDropdownDirection_b("right");
-//       }
-//     }
-//   };
+      if (dropdownRect.right + 80 > windowWidth) {
+        console.log("Switching to left");
+        setDropdownDirection_b("left");
+      } else {
+        console.log("Keeping right");
+        setDropdownDirection_b("right");
+      }
+    }
+  };
   
   const handleBackClick = () => {
-    // navigate(-1);
-    router.back()
+    router.back(); // ✅ Retourne à la page précédente
   };
 
   const handleInputChange = (section, field, value) => {
@@ -545,38 +632,37 @@ const handleCheckboxChange_R = (id, network) => {
       } 
     }));
   };
-  // const handleLocationChange_b = (data) => {
-  //   setcode_pays_b(data?.code_pays);
-  //   setFormData(prev => ({
-  //     ...prev,
-  //     business: {
-  //       ...prev.business,
-  //       pays: data.pays || "",
-  //       ville: data.ville || "",
-  //       indicatif_phone: data?.code_pays,
+  const handleLocationChange_b = (data) => {
+    setcode_pays_b(data?.code_pays);
+    setFormData(prev => ({
+      ...prev,
+      business: {
+        ...prev.business,
+        pays: data.pays || "",
+        ville: data.ville || "",
+        indicatif_phone: data?.code_pays,
      
-  //       address: {
-  //         pays: data.pays || "",
-  //         ville: data.ville || "",
-  //       }
-  //     } 
-  //   }));
-  // };
+        address: {
+          pays: data.pays || "",
+          ville: data.ville || "",
+        }
+      } 
+    }));
+  };
 
-  // const handleServiceToggle = (service) => {
-  //   setFormData(prev => ({
-  //     ...prev,
-  //     services: {
-  //       ...prev.services,
-  //       [service]: !prev.services[service]
-  //     }
-  //   }));
-  // };
+  const handleServiceToggle = (service) => {
+    setFormData(prev => ({
+      ...prev,
+      services: {
+        ...prev.services,
+        [service]: !prev.services[service]
+      }
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData)
-    // console.log(fileName)
 
     // return false;
     const loadingToast = toast.info('Création du compte en cours...', {
@@ -606,29 +692,25 @@ console.log(userid)
 // return false;
 
 
-// const list_services = prepareServicesForSubmission();
+const list_services = prepareServicesForSubmission();
 
   // console.log(list_services)
   // return false;
 const data_param = {
     user : userid,
     data: formData,
-    // list_services : list_services,
-    // cv : cv,
+    list_services : list_services,
+    // files : imgs_save,
     date : formattedDate,
     FCMtoken : data_token
   };
 
   console.log("data_param")
   console.log(data_param)
-  // Envoi
-// axios.post('/api/upload', data, {
-//   headers: { 'Content-Type': 'multipart/form-data' },
-// });
   await axios
-  .post(`${apiUrl}/franchises/creer_franchise`,
-    data_param 
-     )
+  .post(`${apiUrl}/business/devenir_business`,
+    data_param
+    )
   .then((result) => {
 
 // const list_services = prepareServicesForSubmission();
@@ -640,8 +722,7 @@ const data_param = {
           toast.dismiss(loadingToast);
         
            if(result?.data?.old_user != ""){
-            
-               toast.success("demande envoyée avec succès", {
+             toast.info("votre compte business vient d'être activé avec succès", {
                position: "top-center",
                autoClose: 3000,
                hideProgressBar: true,
@@ -652,12 +733,12 @@ const data_param = {
                theme: "light",
                // transition: Bounce,
              });
-           
+             
             //  setIsSubmitting(false); 
 
            }
            else{
-             toast.success('demande envoyée avec succès' , {
+             toast.success('compte crée avec succès' , {
                position: "top-center",
                autoClose: 3000,
                hideProgressBar: true,
@@ -722,33 +803,15 @@ const data_param = {
     }
   };
 
-
-  console.log("postes" + postes)
   return (
     <>
       <ToastContainer className="toast_style"/>
-      <div className="form_bg bg-white franchise_ihm">
+      <div className="form_bg bg-white business_ihm">
         <button onClick={handleBackClick} className='back_cmoponent'>
           <FaChevronLeft size={20} />
         </button>
-          {demande ?
-          
-        (
-              <>
-              <div className="notif_box">
-                votre demande est en cours de traitement...
-                
-              </div>
-              </>
-        )
-      
-      :
-      
-      
-      (
-          <>
- <form autoComplete='off' className='candidature_form'>
-          <div className="container_data">
+
+        <form autoComplete='off' className='candidature_form'>
           <div className="input_group first_zone">
             <div className="lbl_title w-100">vous êtes:</div>
             
@@ -790,47 +853,14 @@ const data_param = {
                     onChange={(e) => handleInputChange("representative", "email", e.target.value)}
                   />
                 </div>
-                <div className="half_col_a dropdown_box">
-  <div className="my_select dropdown" ref={dropdownRef_postes}>
-      <input
-        type="text"
-        value={searchTerm}
-        onChange={(e) => {
-          setSearchTerm(e.target.value);
-          setIsOpen_poste_box(true);
-        }}
-        onClick={() => setIsOpen_poste_box(!isOpen_poste_box)}
-        placeholder="Sélectionnez un poste"
-        className="w-full p-2 border border-gray-300 rounded"
-      />
-      {isOpen_poste_box && (
-        <div
-        className={`dropdown-menu ${dropdownDirection === "left" ? "left-align" : "right-align"}`}
-        >
-          {filteredPostes.length > 0 ? (
-            filteredPostes.map((poste) => (
-              <div
-                key={poste.id}
-                onClick={() => handleSelect(poste)}
-                className="dropdown-item"
-              
-              >
-                {poste.libelle}
-              </div>
-            ))
-          ) : (
-            <div className="p-2 text-gray-500">Aucun poste trouvé</div>
-          )}
-        </div>
-      )}
-    </div>
-                  {/* <input 
+                <div className="half_col_a">
+                  <input 
                     className="input_padding"
                     type="text"
-                    placeholder="fonction dans la franchise"
+                    placeholder="fonction dans l'entreprise"
                     value={formData.representative.position}
                     onChange={(e) => handleInputChange("representative", "position", e.target.value)}
-                  /> */}
+                  />
                 </div>
             
               </div>
@@ -865,7 +895,8 @@ const data_param = {
             <input type="text" 
             className="indicatif input_padding" 
             placeholder="code"
-            value={code_pays} 
+            // value={code_pays} 
+            value={code_pays || ''}
             onChange={(e) => setcode_pays(e.target.value)} />
             
             </div>
@@ -966,21 +997,241 @@ const data_param = {
                    
           </div>
 
-         
+          <div className="input_group first_zone">
+            <div className="lbl_title w-100">votre business:</div>
+            
+            {/* Representative Information */}
+            <div className="line_data_a">
+               <div className="inputs_container_a">
+                <div className="half_col_a">
+                  <input 
+                    className="input_padding"
+                    type="text"
+                    placeholder="nom"
+                    value={formData.business.companyName}
+                    onChange={(e) => handleInputChange("business", "companyName", e.target.value)}
+                  />
+                </div>
+                <div className="half_col_a">
+                  <input
+                    className="input_padding"
+                    type="text"
+                    placeholder="numéro d'enrégistrement"
+                    value={formData.business.registrationNumber}
+                    onChange={(e) => handleInputChange("business", "registrationNumber", e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="line_data_a">
+               <div className="inputs_container_a">
+                <div className="half_col_a">
+                <input 
+                    className="input_padding"
+                    type="text"
+                    placeholder="type de business(sarl, sarlu,etc)"
+                    value={formData.business.type}
+                    onChange={(e) => handleInputChange("business", "type", e.target.value)}
+                  />
+               
+                </div>
+                <div className="half_col_a">
+                  <input
+                    className="input_padding"
+                    type="text"
+                    placeholder="email"
+                    value={formData.business.email}
+                    onChange={(e) => handleInputChange("business", "email", e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+ 
+            <div className="line_data_a">
+              <Locations 
+                className="inline_zone"
+                inputdata={{ 
+                  pays_name: 'pays',
+                  ville_name: 'ville',
+                }} 
+                onChange={handleLocationChange_b} 
+              />
+            </div>
+
+            <div className="line_data_a">
+                     <div className="label_ttl">
+                              <label className="ext_label">
+                              <FontAwesomeIcon icon={faPhone} />
+            
+                              </label>
+                          </div>
+                         <div className="full_col">
+                      
+                      <div className="half_col_a number_container">
+                      <div className="number_zone ">
+            
+            <div className="indicatif">
+            
+            <input type="text" 
+            className="indicatif input_padding" 
+            placeholder="code"
+            value={code_pays_b || ''}
+            // value={code_pays_b} 
+            onChange={(e) => setcode_pays_b(e.target.value)} />
+            
+            </div>
+            
+            <div className="tel_number">
+            
+            <input type="tel" className="contact input_padding" placeholder="numéro"
+                value={phoneNumber_b} onChange={handlePhoneChange_b}  />
+               
+            </div>
+            
+             </div>
+                      </div>
+                        <div className="half_col_a number_uses_container">
+                        <div className="n_label sm_height">
+                          <label className="ext_label ">
+                            utilisé sur
+                          </label>
+                        
+                        </div>
+                  <div className="number_uses_zone sm_height">
+                   
+            
+                   <div className="bottom_data">
+                   <div className="icon_zone">
+                {/* WhatsApp checkbox */}
+                {selectedOptions_rx_b.length === 0 || selectedOptions_rx_b.includes("whatsapp") ? (
+                  <div className="rxsx_chk">
+                    <input
+                      type="checkbox"
+                      checked={selectedOptions_rx_b.includes("whatsapp")}
+                      onChange={() => handleCheckboxChange_B("whatsapp_id", "whatsapp")}
+                      className="mr-2"
+                    />
+                    <FaWhatsapp className="text-green-500 ml-2" />
+                  </div>
+                ) : null}
+            
+                {/* Autres catégories */}
+                {selectedOptions_rx_b
+                  .filter((id) => id !== "whatsapp")
+                  .map((id) => {
+                    const category = categoriesList_rx_b.find((cat) => cat.id === id);
+                    return (
+                      <div key={category.id} className="rxsx_chk">
+                        <input
+                          type="checkbox"
+                          checked
+                          onChange={() => handleCheckboxChange_B(category.ids , category.id)}
+                          className="mr-2"
+                        />
+                        {category.icon} 
+                      </div>
+                    );
+                  })}
+            
+                {/* Bouton dropdown visible SEULEMENT si rien n'est coché */}
+                {selectedOptions_rx_b.length === 0 && (
+                  <div className="dropdown_box">
+                    <div className="dropdown" ref={dropdownRef_rx_b}>
+                      <button className="dropdown-toggle" onClick={handlePlusClick_rx_B}>
+                       <span>autres</span>  
+                      </button>
+            
+                      {isOpen_rx_b && (
+                        <div className={`dropdown-menu ${dropdownDirection_b === "left" ? "left-align" : "right-align"}`}>
+                          {categoriesList_rx_b.map((category) => (
+                            <div key={category.id} className="dropdown-item">
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  checked={selectedOptions_rx_b.includes(category.id)}
+                                  onChange={() => handleCheckboxChange_B(category.ids , category.id)}
+                                  // onChange={() => handleCheckboxChange_R(category.id)}
+                                />
+                                {category.icon} {category.label}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            
+                   </div>
+              
+                       </div>
+                      
+                        </div>
+                   
+            
+             
+              
+                        </div>
+                        </div>
+             
+          </div>
+
+          {/* Services Section */}
+          <div className="mb-3 input_group snd_zone">
+            <div className="lbl_title w-100">
+              vous désirez
+              <span className="mini_txt">(sélectionnez vos besoins)</span>
+            </div>
+
+            <div className="services_grid">
+           
+{Object.entries(afrodites_services).map(([id, { libelle, subcategories }]) => (
+  <div key={id} className="service_item">
+    <label className="flex items-center">
+      <input
+        type="checkbox"
+        checked={formData.services[id]?.active}
+        onChange={() => toggleService(id)}
+        className="cursor-pointer"
+      />
+      <span className="font-medium label">{libelle}</span>
+    </label>
+
+    {formData.services[id]?.active && (
+      <div className=" sub_zone">
+        {subcategories.map(({ id: subId, libelle: subLabel }) => (
+          <label key={subId} className="sub_label flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.services[id].selected.includes(subId)}
+              onChange={() => toggleSubcategory(id, subId)}
+              className="cursor-pointer"
+            />
+            <span>{subLabel}</span>
+          </label>
+        ))}
+      </div>
+    )}
+  </div>
+))}
+
+</div>
+
+            
+            
+          </div>
+
           <div className="my-3 pb-4 text-center">
             <button 
               onClick={handleSubmit}
               className="bg-primary text-white py-2 px-4 rounded hover:bg-primary-dark"
             >
-              Créer 
+              Créer le compte
             </button>
           </div>
-          </div>
-         
         </form>
-          </>
-      )}
-       
       </div>
 
       {isSucess && (
@@ -997,9 +1248,9 @@ const data_param = {
              <h2 className="mb-3 text-center">
                  <label>Bravo!</label>
              </h2>
-            <p className="text-center">votre compte user fut crée avec succès</p>
+            <p className="text-center">votre compte business fut crée avec succès</p>
 
-            <p className="text-center"> votre demande fut envoyée avec succès!</p>
+            <p className="text-center"> désormais vous pouvez:</p>
          
          <button onClick={closeMsg}>continuer<FontAwesomeIcon icon={faAnglesRight} /></button>
           </motion.div>
@@ -1009,5 +1260,4 @@ const data_param = {
   );
 }
 
-export default Create_franchise;
-// export default Create_franchise;
+export default Business;
