@@ -37,7 +37,7 @@ import {
 import { motion } from "framer-motion";
 import { Tooltip } from "react-tooltip";
 
-import Locations from '../../Components/Locations_models.jsx';
+import Locations from '../locations/Locations_models.jsx';
 // import CountrySelector from "../../Components/CountrySelector.jsx";
 import {apiUrl} from "../../config/apiUrl.js"
 
