@@ -2,7 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 // import PostulerModels from '../../components/postuler/Postuler_models';
-import PostulerModels from "../../components/postuler/postuler_models.jsx"
+import PostulerModels from "../../components/postuler_models/postuler_models"
 
 
 export default function PostulerPage() {
