@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { motion } from "framer-motion";
 // import Header_menu from "../../Components/Header_menu";
 // import FixedMenu from "../../Components/FixedMenu";
-import CandidatureForm from "../../components/Postuler/CandidatureForm";
+import CandidatureForm from "../../components/postuler/CandidatureForm.jsx";
 import { useAuth } from "../../Context/AuthenticateContext.jsx";
 import axios from "axios";
 import { apiUrl } from "../../config/apiUrl";

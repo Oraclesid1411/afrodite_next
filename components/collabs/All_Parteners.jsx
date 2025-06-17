@@ -1,3 +1,5 @@
+'use client';
+
 import React , {useState, useEffect} from 'react'
 
 // import Slider from "react-slick";
@@ -97,6 +99,8 @@ const groupedResults = photographes_data.reduce((acc, row) => {
     return acc;
   }, []);
 
+  // console.log("groupedResults")
+  // console.log(groupedResults)
   
   const groupedResultsStyliste = stylistes_data.reduce((acc, row) => {
     // Vérifie si le mannequin existe déjà dans l'accumulateur
@@ -256,7 +260,27 @@ const groupedResults = photographes_data.reduce((acc, row) => {
   console.log(groupedResultsBoutiques)
 
 
-  const [deviceWidth, setDeviceWidth] = useState(window.innerWidth);
+  // const [deviceWidth, setDeviceWidth] = useState(window.innerWidth);
+
+  const [deviceWidth, setDeviceWidth] = useState(0);
+
+  useEffect(() => {
+    // Fonction pour mettre à jour la largeur
+    const updateWidth = () => {
+      setDeviceWidth(window.innerWidth);
+    };
+
+    // Initialiser la valeur une fois le composant monté
+    updateWidth();
+
+    // Ajouter l'écouteur d'événement
+    window.addEventListener('resize', updateWidth);
+
+    // Nettoyer l'écouteur à la destruction du composant
+    return () => {
+      window.removeEventListener('resize', updateWidth);
+    };
+  }, []);
 
   // Détecter les changements de taille de l'écran
   useEffect(() => {
@@ -317,7 +341,7 @@ const groupedResults = photographes_data.reduce((acc, row) => {
                                             <div className="row p-0">
                                                {groupedResults.map((item) => (
                                                         <>
-                                                            <div key={item?.contributor_id} className="box col-lg-2 col-md-4 col-4 aos-init aos-animate" data-aos="fade-up" data-aos-duration="700">
+                                                            <div key={item?.model_id} className="box col-lg-2 col-md-4 col-4 aos-init aos-animate" data-aos="fade-up" data-aos-duration="700">
 
                                                    <div className="product-card listing">
                                                        <div className="product-card-img">
