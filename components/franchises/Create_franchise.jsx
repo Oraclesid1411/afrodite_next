@@ -16,7 +16,7 @@ import { faPhone, faPlus , faAnglesRight } from '@fortawesome/free-solid-svg-ico
 import { FaWhatsapp, FaTelegram } from "react-icons/fa";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Locations from '../../Components/Locations_models';
+import Locations from '../locations/Locations_models.jsx';
 // import Locations from './Components/Locations_models';
 import axios from 'axios' 
 import { motion } from "framer-motion";
