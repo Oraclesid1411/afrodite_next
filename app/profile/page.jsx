@@ -3,17 +3,15 @@
 import { useState, useEffect } from "react";
 
 import { usePathname, useSearchParams } from "next/navigation";
-import Link from 'next/link';
-// import { useLocation } from 'react-router-dom'; 
-import { motion } from "framer-motion";
-// import Header_menu from "../../Components/Header_menu";
-// import FixedMenu from "../../Components/FixedMenu";
+// import Link from 'next/link'; 
+
+import { motion } from "framer-motion"; 
 import CandidatureForm from "../../components/postuler_models/CandidatureForm.jsx";
 import { useAuth } from "../../Context/AuthenticateContext.jsx";
 import axios from "axios";
 import { apiUrl } from "../../config/apiUrl";
 const AccordionItem = ({ title, children, defaultOpen = false }) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+const [isOpen, setIsOpen] = useState(defaultOpen);
   
   return (
     <div className="accordion_box border rounded-md mb-2 mt-2">

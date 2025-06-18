@@ -6,9 +6,9 @@ import NavItem from 'react-bootstrap/NavItem';
 import NavLink from 'react-bootstrap/NavLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faHome, faCalendar,  faList } from '@fortawesome/free-solid-svg-icons';
-// import Link from 'next/link';
+import Link from 'next/link';
 import { usePathname, useRouter   } from "next/navigation";
-
+import { apiUrl } from '../config/apiUrl.js';
 // import { useLocation } from 'react-router-dom'; // Pour gérer l'URL actuelle
 // import { Modal, Accordion, Card, Button } from 'react-bootstrap';  
 import {  faYoutube } from '@fortawesome/free-brands-svg-icons';
@@ -35,7 +35,7 @@ const CustomModal_b = ({ show, children }) => {
 
 
 const FixedMenu = () => {
-    const apiUrl = 'https://apiafro.aafrodites.com'
+    // const apiUrl = 'https://apiafro.aafrodites.com'
   
     const auth = useAuth();
     axios.defaults.withCredentials = true;
@@ -344,37 +344,26 @@ useEffect(() => {
                                        return (
                                        
                                         <NavItem key={`tab-${index}`} className='nav_item'>
-                                        <NavLink
-                                            // href={tab.link}
-                                            href={tab.label === "menu" ? "#" : tab.link}
-                                            className="nav-link"
-                                            id={tab.id || ""}
-                                            activeclassName="active"
-                                            onClick={tab.label === "Menu" ? () => handleOpenModal('modal_1') : null}
+                                         <Link
+        href={tab.label === "Menu" ? "#" : tab.link}
+        className={`nav-link ${isActive ? 'active' : ''}`}
+        id={tab.id || ""}
+        onClick={(e) => {
+          if (tab.label === "Menu") {
+            e.preventDefault(); // éviter navigation
+            handleOpenModal?.('modal_1');
+          }
+        }}
+      >
+        <div className="icon_box">
+          <FontAwesomeIcon size="sm" icon={tab.icon} />
+          <div className="label_sm">{tab.label}</div>
 
-                                            // onClick={tab.label === "Menu" ? handleOpenModal : null}
-                                        >
-                                            <div className="icon_box">
-                                                <FontAwesomeIcon size="sm" icon={tab.icon} />
-                                                <div className="label_sm">{tab.label}</div>
-                                              
-                                                {tab.label === "Menu" ? 
-                                                <> 
-                                                {unRead > 0 ?
-                                                 
-                                                 <span className='badge_unread'>{unRead}</span>
-                                                
-                                                 
-                                                :
-                                                null
-                                                }
-                                               </>
-                                                : null
-                                                
-                                                }
-                                               
-                                            </div>
-                                        </NavLink>
+          {tab.label === "Menu" && unRead > 0 && (
+            <span className="badge_unread">{unRead}</span>
+          )}
+        </div>
+      </Link>
                                     </NavItem>
                                        )
                                   

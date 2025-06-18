@@ -1453,10 +1453,7 @@ const handleOpenModal = (modalId, e) => {
                                         <>
 
                                           <li className="menu-list-item nav-item has-dropdown">
-                                          <li className="menu-list-item nav-item">
-                                               
-                                            </li>
-                                                <div className="mega-menu-header">
+                                                 <div className="mega-menu-header">
                                                 <a className="nav-link" href="#">{user_info?.pseudo}</a>
                                                     
                                                     <span className="open-submenu">
