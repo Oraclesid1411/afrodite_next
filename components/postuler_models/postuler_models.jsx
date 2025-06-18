@@ -838,7 +838,7 @@ const handleBackClick = () => {
       try {
         const response = await axios.post(`${apiUrl}/postulant/info`, params);
         if (response.data?.length > 0) {
-          navigate("/etatcandidature");
+          router.push("/etatcandidature");
         }
       } catch (err) {
         console.error("Erreur lors de la récupération des données :", err);
@@ -1052,7 +1052,7 @@ if (updatedImages.path) {
   const closeModal = () => setAddimg(0);
   
   const closeModal_notif = () => {
-    navigate("/profile")
+    router.push("/profile")
   };
   const Addimgs = (zone) => {
 

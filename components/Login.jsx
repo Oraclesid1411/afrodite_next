@@ -90,7 +90,7 @@ const location = useLocation();
                             //      { state: { previousPath: location.pathname }});
                
                             setTimeout(() => {
-                                navigate(redirectTo , 
+                                router.push(redirectTo , 
                                 { state: { data: login_res?.data , currentpage : "/login" }}
 
                                 ) ; // Remplacez '/next-page' par la route cible

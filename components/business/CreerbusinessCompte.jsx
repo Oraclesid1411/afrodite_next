@@ -70,7 +70,7 @@ function Business() {
     
       const closeMsg = () => {
         setisSucess(false);
-        navigate("/profile"); // remplace par le chemin voulu
+        router.push("/profile"); // remplace par le chemin voulu
       };
        useEffect(() => {
         const fetchData = async () => {
