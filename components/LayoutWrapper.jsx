@@ -49,8 +49,17 @@ export default function LayoutWrapper({ children }) {
 
 
   const pathname = usePathname();
-  const isAuthPage = ['/login', '/register', '/forgotpass', '/postuler', '/creerfranchise', '/creercomptebusiness'].includes(pathname);
+  // const isAuthPage = ['/admin','/admin/*', '/login', '/register', '/forgotpass', '/postuler', '/creerfranchise', '/creercomptebusiness'].includes(pathname);
+  const isAuthPage = [
+    '/login',
+    '/register',
+    '/forgotpass',
+    '/postuler',
+    '/creerfranchise',
+    '/creercomptebusiness',
+  ].includes(pathname) || pathname.startsWith('/admin');
 
+  
   return (
     <div id="root">
       {!isAuthPage && <Header_menu />}

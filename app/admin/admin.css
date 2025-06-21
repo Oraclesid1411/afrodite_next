@@ -1,0 +1,319 @@
+/* admin_layout structure */
+.admin_layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f3f4f6;
+  }
+  
+  /* SIDEBAR */
+  .admin_sidebar {
+    width: 250px;
+    background-color: #ffffff;
+    border-right: 1px solid #e0e0e0;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    transition: transform 0.3s ease;
+    z-index: 100;
+  }
+  
+  .admin_sidebar.hide {
+    transform: translateX(-100%);
+  }
+  
+  .admin_sidebar.show {
+    transform: translateX(0);
+  }
+  
+  .sidebar_menu {
+    padding: 1.5rem;
+  }
+  
+  .sidebar_title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+  }
+  
+  .sidebar_links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar_link {
+    display: block;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: #333;
+    border-radius: 5px;
+    transition: background 0.2s;
+  }
+  
+  .sidebar_link:hover,
+  .sidebar_link.active {
+    background-color: #e5e7eb;
+    font-weight: 600;
+  }
+  
+  /* MAIN */
+  .admin_main {
+    margin-left: 250px;
+    width: 100%;
+    transition: margin-left 0.3s ease;
+  }
+  
+  .admin_sidebar.hide + .admin_main {
+    margin-left: 0;
+  }
+  
+  /* HEADER */
+  .admin_header {
+    height: 60px;
+    background-color: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.5rem;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 250px;
+    z-index: 90;
+    transition: left 0.3s ease;
+  }
+  
+  .admin_sidebar.hide + .admin_main .admin_header {
+    left: 0;
+  }
+  
+  .header_left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .toggle_sidebar_btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+  
+  .header_right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .logout_btn {
+    background-color: #dc2626;
+    color: #fff;
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .logout_btn:hover {
+    background-color: #b91c1c;
+  }
+  
+  .admin_content {
+    margin-top: 60px;
+    padding: 2rem;
+  }
+  
+
+  /* gestions des models */
+
+  /* mannequin */
+  .mannequins_page {
+    padding: 1rem;
+  }
+  
+  .mannequins_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .add_button {
+    background-color: #2563eb;
+    color: #fff;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.2s ease;
+  }
+  
+  .add_button:hover {
+    background-color: #1d4ed8;
+  }
+  
+  .mannequins_table_wrapper {
+    overflow-x: auto;
+  }
+  
+  .mannequins_table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .mannequins_table th,
+  .mannequins_table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .mannequins_table th {
+    background: #f9fafb;
+  }
+  
+  .action_btn {
+    margin-right: 0.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  .edit {
+    color: #0284c7;
+  }
+  
+  .delete {
+    color: #dc2626;
+  }
+  
+  /* end mannequins */
+
+  /* end models */
+
+  /* vlogs */
+  .vlog_form {
+    display: block;
+    min-height: 25vh;
+    margin-bottom: 2rem;
+    /* border: 1px solid red; */
+    background-color: rgb(255, 255, 255);
+    padding: .7em .5em;
+  }
+
+  .vlog_form .input_group{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* grid-template-columns: 1fr; */
+    gap: 1rem;
+ 
+  }
+  
+  .vlog_form input,
+  .vlog_form select {
+    display: inline-block;
+    padding: .5em 1em;
+    width: calc(100% / 3.2);
+    max-width: 240px;
+    padding: 0.6rem;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+  }
+  
+ .vlog_form .form_btn_container{
+display: flex;
+align-items: center;
+justify-content: center;
+margin: 1em auto;
+width: 100%;
+  }
+  .vlog_form .form_btn_container button {
+    background-color: #2563eb;
+    color: white;
+    padding: 0.6rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: .5em 1.5em;
+  }
+  .vlog_form .form_btn_container .reset_btn{
+    background-color: #ffffff;
+    color: rgb(7, 5, 5);
+    border: .7px solid rgba(0, 0, 0, .5) !important;
+  }
+  
+  .vlog_form .form_btn_container button:hover {
+    background-color: #1d4ed8;
+  }
+  
+  .vlog_form .upload_input {
+    padding: 0.4rem;
+    border: 1px dashed #9ca3af;
+    border-radius: 5px;
+    background-color: #f9fafb;
+  }
+  
+  @media (min-width: 768px) {
+    .vlog_form {
+      grid-template-columns: repeat(3, 1fr) auto;
+    }
+  }
+  
+  .vlog_filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .vlog_filters input,
+  .vlog_filters select {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .vlogs_table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .vlogs_table th,
+  .vlogs_table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+  }
+  
+  .vlogs_table th {
+    background: #f9fafb;
+  }
+  
+  .action_btn {
+    margin-right: 0.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  .edit {
+    color: #0284c7;
+  }
+  
+  .delete {
+    color: #dc2626;
+  }
+  
+
+  /* end vlogs */

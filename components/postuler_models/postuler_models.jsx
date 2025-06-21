@@ -1050,7 +1050,7 @@ if (updatedImages.path) {
     }, [cameraActive ]);
   
   const closeModal = () => setAddimg(0);
-  
+   
   const closeModal_notif = () => {
     router.push("/profile")
   };
