@@ -3306,3 +3306,13 @@ margin-top: 1em;
     text-align: center;
   }
 }
+
+.fancybox__content {
+  max-width: 90vw !important;
+  max-height: 80vh !important;
+}
+
+.fancybox__iframe {
+  width: 100% !important;
+  height: 100% !important;
+}

@@ -31,7 +31,16 @@ function All_Vlogs() {
   const [defiles , setDefiles] = useState([]);
   const [interviews , setInterviews] = useState([]);
   
-
+  function getEmbeddedUrl(path) {
+    const youtubeMatch = path.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+    if (youtubeMatch) {
+      return `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=1`;
+    }
+  
+    // TikTok, autre... à adapter si besoin
+    return path;
+  }
+  
     useEffect(() => {
       const fetchData = async () => {
         try {
@@ -81,16 +90,17 @@ function All_Vlogs() {
                                                    
                                                             <div className="product-card video_card">
                                                                 <div className="product-card-img">
-                                                                    <a className="hover-switch"
-                                                                      data-fancybox="video-gallery"
-                                                                      href={item?.path}
-                                                                      data-caption="Video 1">
-                                                                        
-                                                                    <img src={item?.thumbnail} alt="video" className='img'/>
-                                                                    <button className="play-button">▶</button>
-                                                                        
-                                                                    </a>
-                                                                
+                                                                <a
+  className="hover-switch clip_video"
+  data-fancybox="video-gallery"
+  data-caption={item?.titre}
+  data-type="iframe"
+  href={getEmbeddedUrl(item?.path)}
+>
+  <img src={item?.thumbnail} alt="video" loading="lazy" className="img" />
+  <button className="play-button">▶</button>
+</a>
+
                                                                 </div>
 
                                                             </div>
