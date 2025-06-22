@@ -6,13 +6,23 @@ import axios from 'axios'
 import { convertVideoToResolutions } from '../../../sevices/compressVideoResolutions';
 import { apiUrl } from '../../../config/apiUrl';
 
-const initialForm = { id: null, 
-                    titre: '',
-                     lien: '',
-                      source: '#',
-                      statut: 'Brouillon'
-                     };
-
+// const initialForm = { id: null, 
+//                     titre: '',
+//                      lien: '',
+//                       source: '#',
+//                       statut: 'Brouillon'
+//                      };
+const initialForm = {
+    id: null,
+    titre: '',
+    lien: '',               // Lien principal de la vidéo
+    source: '#',            // '#', 'local', 'youtube', 'tiktok', etc.
+    thumbnail: '',          // Lien de la miniature
+    videos: [],             // Tableau des liens multiples (local only)
+    statut: 'Brouillon',    // 'Publié' ou 'Brouillon'
+    vlog_type_id: '',       // ID de la catégorie/type de vidéo
+  };
+  
 export default function PageVlogs() {
   const [vlogs, setVlogs] = useState([]);
   const [vlogTypes, setVlogTypes] = useState([]);
@@ -20,6 +30,9 @@ export default function PageVlogs() {
   const [search, setSearch] = useState('');
   const [filterStatut, setFilterStatut] = useState('');
 
+  const handleNew = () => {
+    setFormData(initialForm);
+  };
 
   useEffect(() => {
     const fetchVlogTypes = async () => {
@@ -33,18 +46,39 @@ export default function PageVlogs() {
   
     fetchVlogTypes();
   }, []);
-  useEffect(() => {
-    // Exemple de données
-    setVlogs([
-      { id: 1, titre: 'Interview de la Miss 2025', lien: 'https://...', statut: 'Publié', date: '2025-06-01' },
-      { id: 2, titre: 'Conseils de posture', lien: 'https://...', statut: 'Brouillon', date: '2025-05-22' },
-    ]);
 
+  useEffect(() => {
+    fetchVlogs();
   }, []);
+  
+  const fetchVlogs = async () => {
+    try {
+      const res = await axios.get(`${apiUrl}/vlogs/all`);
+
+      console.log("res.data")
+      console.log(res.data)
+      if (res.data.success) {
+        // alert('here')
+        const sorted = res.data.vlogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setVlogs(sorted);
+      }
+    } catch (error) {
+      console.error("Erreur lors du chargement des vidéos :", error);
+    }
+  };
+  
+  // useEffect(() => {
+  //   // Exemple de données
+  //   setVlogs([
+  //     { id: 1, titre: 'Interview de la Miss 2025', lien: 'https://...', statut: 'Publié', date: '2025-06-01' },
+  //     { id: 2, titre: 'Conseils de posture', lien: 'https://...', statut: 'Brouillon', date: '2025-05-22' },
+  //   ]);
+
+  // }, []);
 
   
 //   upload de la video
-  const [videoPreviews, setVideoPreviews] = useState([]);
+    const [videoPreviews, setVideoPreviews] = useState([]);
     const [videoupload, setUploadevideo] = useState([]); 
  
 // Fonction utilitaire pour convertir base64 en File
@@ -136,6 +170,8 @@ return new Promise((resolve, reject) => {
  };
 });
 };
+
+
    
     // const next_option_videos = async () => {
      
@@ -252,6 +288,82 @@ return new Promise((resolve, reject) => {
           }
         };
       };
+
+      const extractThumbnailFromLink = (link, source) => {
+        if (source === "youtube") {
+          const match = link.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+          if (match && match[1]) {
+            return `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg`;
+          }
+        }
+      
+        // Pour TikTok, à faire manuellement ou à ignorer
+        return ""; // ou une image par défaut
+      };
+      
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log("formData", formData);
+      
+        try {
+          const res = await axios.post(`${apiUrl}/vlogs/create`, formData, {
+            headers: { 'Content-Type': 'application/json' },
+          });
+      
+          console.log("res?.data", res?.data);
+      
+          if (res.data.success) {
+            alert("✅ Vidéo enregistrée avec succès !");
+            setFormData(initialForm);
+            await fetchVlogs(); // mise à jour automatique
+          }
+
+          else {
+            alert("❌ Échec de l’enregistrement");
+          }
+        } catch (err) {
+          console.error(err);
+          alert("🚨 Erreur réseau");
+        }
+      };
+      
+      // const handleSubmit = async (e) => {
+      //   e.preventDefault();
+      
+      //   console.log("formData")
+        
+      
+      //   // const thumb = extractThumbnailFromLink(formData.lien, formData.source);
+
+      //   // const dataToSend = {
+      //   //   ...formData,
+      //   //   thumbnail: thumb,
+      //   // };
+      
+
+      //   console.log(formData)
+      //   // return false;
+      //   try {
+      //     const res = await axios.post(`${apiUrl}/vlogs/create`, formData, {
+      //       headers: { 'Content-Type': 'application/json' },
+      //     });
+      
+      //     console.log("res?.data")
+      //     console.log(res?.data)
+       
+      // //  return false;
+      //     if (res.data.success) {
+      //       alert("✅ Vidéo enregistrée avec succès !");
+      //       // reset form etc.
+      //     } else {
+      //       alert("❌ Échec de l’enregistrement");
+      //     }
+      //   } catch (err) {
+      //     console.error(err);
+      //     alert("🚨 Erreur réseau");
+      //   }
+      // };
+      
 //   const handleVideoUpload = async (e) => {
 //     const file = e.target.files[0];
 //     if (!file) return;
@@ -278,23 +390,32 @@ return new Promise((resolve, reject) => {
 //     }
 //   };
   
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!formData.titre || !formData.lien) return;
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//     if (!formData.titre || !formData.lien) return;
 
-    if (formData.id) {
-      setVlogs((prev) =>
-        prev.map((v) => (v.id === formData.id ? { ...formData, date: v.date } : v))
-      );
-    } else {
-      const newVlog = { ...formData, id: Date.now(), date: new Date().toISOString().slice(0, 10) };
-      setVlogs((prev) => [...prev, newVlog]);
-    }
+//     if (formData.id) {
+//       setVlogs((prev) =>
+//         prev.map((v) => (v.id === formData.id ? { ...formData, date: v.date } : v))
+//       );
+//     } else {
+//       const newVlog = { ...formData, id: Date.now(), date: new Date().toISOString().slice(0, 10) };
+//       setVlogs((prev) => [...prev, newVlog]);
+//     }
 
-    setFormData(initialForm);
-  };
-
-  const handleEdit = (vlog) => setFormData(vlog);
+//     setFormData(initialForm);
+//   };
+const handleEdit = (video) => {
+  setFormData({
+    id: video.id,
+    titre: video.titre,
+    lien: video.path,
+    source: video.source_label || "youtube", // selon structure
+    thumbnail: video.thumbnail,
+    vlog_type_id: video.type_vlog,
+    statut: video.public === 1 ? "Publié" : "Brouillon",
+  });
+};
 
   const handleDelete = (id) => {
     if (confirm('Supprimer ce vlog ?')) {
@@ -302,13 +423,29 @@ return new Promise((resolve, reject) => {
     }
   };
 
-  const filtered = vlogs.filter((v) =>
-    v.titre.toLowerCase().includes(search.toLowerCase()) &&
-    (filterStatut ? v.statut === filterStatut : true)
-  );
+  const filtered = vlogs.filter((v) => {
+    if (!v.titre) return false;
+  
+    const matchTitre = v.titre.toLowerCase().includes(search.toLowerCase());
+    const matchStatut = filterStatut === '' || v.statut == filterStatut;
+  
+    return matchTitre && matchStatut;
+  });
+  
+  // const filtered = vlogs.filter((v) =>
+  // {
+  //     if (v.titre === undefined || v.titre === null ) return false;
 
-  console.log("vlogTypes")
-  console.log(vlogTypes)
+  //     console.log("filterStatut")
+  //     console.log(filterStatut)
+   
+  //   v.titre.toLowerCase().includes(search.toLowerCase()) &&
+  //   (filterStatut ? v.statut === filterStatut : true) }
+  // );
+
+  console.log("vlogs")
+  console.log(vlogs)
+  console.log(filtered)
   return (
     <div className="vlogs_page">
       {/* Formulaire d'ajout / édition */}
@@ -361,6 +498,12 @@ return new Promise((resolve, reject) => {
           placeholder="Lien vidéo"
           value={formData.lien}
           onChange={(e) => setFormData({ ...formData, lien: e.target.value })}
+          onBlur={() => {
+            const thumbnail = extractThumbnailFromLink(formData.lien, formData.source);
+            if (thumbnail) {
+              setFormData((prev) => ({ ...prev, thumbnail }));
+            }
+          }}
         />
          <select
   value={formData.vlog_type_id || ''}
@@ -383,6 +526,19 @@ return new Promise((resolve, reject) => {
           <option value="Brouillon">Brouillon</option>
         </select>
         </div>
+
+        {formData.thumbnail && (
+          <div className="col-12">
+ <div className="thumbnail_preview">
+    <img
+      src={formData.thumbnail}
+      alt="Miniature de la vidéo"
+      style={{ maxWidth: "100%", maxHeight: 150, marginTop: 10 }}
+    />
+  </div>
+          </div>
+ 
+)}
      <div className="form_btn_container">
      <button type="submit">{formData.id ? 'Mettre à jour' : 'Ajouter'}</button>
      {formData.id && (
@@ -416,18 +572,30 @@ return new Promise((resolve, reject) => {
       <table className="vlogs_table">
         <thead>
           <tr>
+             <th>#</th>
             <th>Titre</th>
+            <th>Source</th>
             <th>Statut</th>
+            <th>Miniature</th>
             <th>Date</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {filtered.map((v) => (
+          {filtered.map((v , index) => (
             <tr key={v.id}>
+               <td>{index + 1}</td>
               <td>{v.titre}</td>
+              <td>{v.source}</td>
               <td>{v.statut}</td>
-              <td>{v.date}</td>
+              <td>
+          {v.thumbnail ? (
+            <img src={v.thumbnail} alt="thumb" style={{ height: 50 }} />
+          ) : (
+            "N/A"
+          )}
+        </td>
+        <td>{v.created_at}</td>
               <td>
                 <button className="action_btn edit" onClick={() => handleEdit(v)}>✏️</button>
                 <button className="action_btn delete" onClick={() => handleDelete(v.id)}>🗑️</button>
