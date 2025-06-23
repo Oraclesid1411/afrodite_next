@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios'
 import { convertVideoToResolutions } from '../../../sevices/compressVideoResolutions';
 import { apiUrl } from '../../../config/apiUrl';
+const defaultTikTokThumb = "/assets/img/icons/tiktok_1.png";
 
 // const initialForm = { id: null, 
 //                     titre: '',
@@ -94,6 +95,10 @@ function base64ToFileV(base64, filename) {
     }
     
     return new File([u8arr], filename, { type: mime });
+  }
+  
+  function getTikTokThumbnail(link) {
+    return defaultTikTokThumb; // image par défaut à toi
   }
   
   const extractThumbnail = (videoFiles, apiUrl) => {
@@ -295,6 +300,9 @@ return new Promise((resolve, reject) => {
           if (match && match[1]) {
             return `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg`;
           }
+        }
+        else if (source === "tiktok") {
+          return getTikTokThumbnail(link);
         }
       
         // Pour TikTok, à faire manuellement ou à ignorer

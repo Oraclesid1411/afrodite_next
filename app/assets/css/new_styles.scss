@@ -3316,3 +3316,20 @@ margin-top: 1em;
   width: 100% !important;
   height: 100% !important;
 }
+.video_card .card-title {
+  margin: .5em auto;
+  // border: 1px solid lime;
+  margin-bottom: 0;
+  label {
+    display: block; // ou inline-block selon ton HTML
+    white-space: nowrap;         // Empêche les retours à la ligne
+    overflow: hidden;            // Cache tout ce qui dépasse
+    text-overflow: ellipsis;     // Affiche les "..."
+  
+    height: auto !important;
+    max-width: 100%;
+    font-family: $secondary_font-family;
+    font-size: 13px;
+    font-weight: 550;
+  }
+}
