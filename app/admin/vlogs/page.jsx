@@ -425,12 +425,33 @@ const handleEdit = (video) => {
   });
 };
 
-  const handleDelete = (id) => {
-    if (confirm('Supprimer ce vlog ?')) {
-      setVlogs((prev) => prev.filter((v) => v.id !== id));
+  // const handleDelete = (id) => {
+  //   if (confirm('Supprimer ce vlog ?')) {
+  //     setVlogs((prev) => prev.filter((v) => v.id !== id));
+  //   }
+  // };
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("❗ Confirmer la suppression de cette vidéo ?");
+  
+    if (!confirmDelete) return;
+  
+    try {
+      const res = await axios.post(`${apiUrl}/vlogs/delete/${id}`);
+  
+      if (res.data.success) {
+        alert("✅ Vidéo supprimée avec succès !");
+        // Recharger la liste après suppression
+        fetchVlogs(); // ← Cette fonction doit réactualiser ta liste
+      } else {
+        alert("❌ Suppression échouée : " + res.data.message);
+      }
+    } catch (error) {
+      console.error("Erreur de suppression:", error);
+      alert("🚨 Erreur réseau ou serveur lors de la suppression.");
     }
   };
-
+  
   const filtered = vlogs.filter((v) => {
     if (!v.titre) return false;
   
