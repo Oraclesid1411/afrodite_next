@@ -23,17 +23,10 @@ function All_Vlogs() {
   const [vlogTypes, setVlogTypes] = useState([]);
   // const [filterType, setFilterType] = useState('');
   
+  const [stats, setStats] = useState({ likes_count: 0, shares_count: 0 });
+  const [liked, setLiked] = useState(false);
   const [Allvlog , setAllvlog] = useState([]);
-
-  // console.log("Allvlog")
-  // console.log(Allvlog)
- 
-  // const [actus , setActus] = useState([]);
-  // const [lives , setLives] = useState([]);
-  // const [castings , setCastings] = useState([]);
-  // const [defiles , setDefiles] = useState([]);
-  // const [interviews , setInterviews] = useState([]);
-  
+   
   const getEmbeddedUrl = (path, source) => {
     if (source === 2) {
       // YouTube
@@ -58,31 +51,7 @@ function All_Vlogs() {
     return path;
   };
   
-  
-// useEffect(() => {
-//   const fetchTypes = async () => {
-//     try {
-//       const res = await axios.get(`${apiUrl}/vlogtypes`);
-//       // Ajouter "Tous" en premier
-//       setVlogTypes([{ id: '', libelle: 'Tous', slug: 'all' }, ...res.data]);
-//     } catch (err) {
-//       console.error("Erreur récupération types :", err);
-//     }
-//   };
-
-//   fetchTypes();
-// }, []);
-
-  // function getEmbeddedUrl(path) {
-  //   const youtubeMatch = path.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
-  //   if (youtubeMatch) {
-  //     return `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=1`;
-  //   }
-  
-  //   // TikTok, autre... à adapter si besoin
-  //   return path;
-  // }
-  
+   
     useEffect(() => {
       const fetchData = async () => {
         try {
@@ -99,10 +68,41 @@ function All_Vlogs() {
       };
       fetchData();
     }, []);
-
-    // console.log("vlogTypes")
-    // console.log(vlogTypes)
-
+  
+    useEffect(() => {
+      fetchStats();
+    }, []);
+  
+    const fetchStats = async () => {
+      try {
+        const res = await axios.get(`${apiUrl}/vlogs/post_stats/${postId}`);
+      console.log('res stats:', res)
+      
+        if (res.data.success) setStats(res.data.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+  
+    const handleLike = async () => {
+      try {
+        await axios.post(`${apiUrl}/vlogs/like/${postId}`, { id_user: userId });
+        setLiked(!liked);
+        fetchStats();
+      } catch (err) {
+        console.error(err);
+      }
+    };
+  
+    const handleShare = async () => {
+      try {
+        await axios.post(`${apiUrl}/vlogs/share/${postId}`, { id_user: userId });
+        alert("✅ Partagé !");
+        fetchStats();
+      } catch (err) {
+        console.error(err);
+      }
+    };
   return (
     <>
                 <div className="container tab_list_box mb-3">
@@ -159,6 +159,14 @@ function All_Vlogs() {
 
                 </div>
                 <div className="card-title">
+                <div className="video-actions">
+      <button onClick={handleLike}>
+        ❤️ {stats.likes_count}
+      </button>
+      <button onClick={handleShare}>
+        🔄 {stats.shares_count}
+      </button>
+    </div>
                   <label>{v?.titre} </label>
                 </div>
 
