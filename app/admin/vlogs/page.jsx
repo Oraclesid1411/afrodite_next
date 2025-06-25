@@ -437,7 +437,8 @@ const handleEdit = (video) => {
     if (!confirmDelete) return;
   
     try {
-      const res = await axios.post(`${apiUrl}/vlogs/delete/${id}`);
+     const res = await axios.post(`${apiUrl}/vlogs/delete`, { id });
+
   
       if (res.data.success) {
         alert("✅ Vidéo supprimée avec succès !");
