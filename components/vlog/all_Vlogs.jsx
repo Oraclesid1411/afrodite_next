@@ -70,8 +70,9 @@ function All_Vlogs() {
     }, []);
   
     useEffect(() => {
+      console.log(Allvlog)
       fetchStats();
-    }, []);
+    }, [Allvlog]);
   
     const fetchStats = async () => {
       try {
