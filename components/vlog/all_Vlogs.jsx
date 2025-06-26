@@ -4,6 +4,9 @@ import React, {useState, useEffect} from 'react'
 
 import axios from 'axios';
 import {apiUrl} from "../../config/apiUrl.js"
+
+ 
+import { useAuth } from '../../Context/AuthenticateContext.jsx';
 import TikTokEmbed from '../TikTokEmbed.jsx';
 // import Slider from "react-slick";
 
@@ -23,10 +26,18 @@ function All_Vlogs() {
   const [vlogTypes, setVlogTypes] = useState([]);
   // const [filterType, setFilterType] = useState('');
   
-  const [stats, setStats] = useState({ likes_count: 0, shares_count: 0 });
+  // const [stats, setStats] = useState({ likes_count: 0, shares_count: 0 });
   const [liked, setLiked] = useState(false);
   const [Allvlog , setAllvlog] = useState([]);
-   
+  const [GroupedVlogs, setGroupedVlogs] = useState([]);
+  const [statsMap, setStatsMap] = useState({}); // Clé = id_post, Valeur = stats
+
+
+    const auth = useAuth();
+    const user_info = auth.currentUser;
+
+    const userId  = user_info?.id;
+  
   const getEmbeddedUrl = (path, source) => {
     if (source === 2) {
       // YouTube
@@ -52,40 +63,113 @@ function All_Vlogs() {
   };
   
    
+    // useEffect(() => {
+    //   const fetchData = async () => {
+    //     try {
+    //       const [rep , rep1] = await Promise.all([
+    //         axios.get(`${apiUrl}/vlogs/all`),
+    //         axios.get(`${apiUrl}/vlogs/vlog_type`),
+    //        ]);
+
+    //       setAllvlog(rep.data?.vlogs)
+    //       setVlogTypes([{ id: '', libelle: 'Tous', slug: 'all' }, ...rep1.data]);
+        
+        
+    //     } catch (err) {
+    //       console.error("Erreur lors de la récupération des données :", err);
+    //     }
+    //   };
+    //   fetchData();
+    // }, []);
+  
     useEffect(() => {
-      const fetchData = async () => {
+      const fetchVlogs = async () => {
         try {
-          const [rep , rep1] = await Promise.all([
+          const [vlogsRes, typesRes] = await Promise.all([
             axios.get(`${apiUrl}/vlogs/all`),
             axios.get(`${apiUrl}/vlogs/vlog_type`),
-           ]);
-
-          setAllvlog(rep.data?.vlogs)
-          setVlogTypes([{ id: '', libelle: 'Tous', slug: 'all' }, ...rep1.data]);
-         } catch (err) {
-          console.error("Erreur lors de la récupération des données :", err);
+          ]);
+    
+          const allVlogs = vlogsRes.data?.vlogs || [];
+    
+          // Grouper les vlogs par id_contenu
+          const groupedMap = new Map();
+          allVlogs.forEach((item) => {
+            if (!groupedMap.has(item.id_contenu)) {
+              groupedMap.set(item.id_contenu, item);
+            }
+          });
+    
+          const groupedArray = Array.from(groupedMap.values());
+    
+          setAllvlog(allVlogs);
+          setGroupedVlogs(groupedArray);
+          setVlogTypes([{ id: '', libelle: 'Tous', slug: 'all' }, ...typesRes.data]);
+        } catch (err) {
+          console.error("Erreur lors du chargement des vlogs :", err);
         }
       };
-      fetchData();
+    
+      fetchVlogs();
     }, []);
-  
+    
+    console.log("Allvlog")
+    console.log(Allvlog)
+    console.log(GroupedVlogs)
+
+    // useEffect(() => {
+    //   const fetchStats = async () => {
+    //     if (!Allvlog.length) return;
+    
+    //     const newStatsMap = {};
+    //     await Promise.all(
+    //       Allvlog.map(async (vlog) => {
+    //         try {
+    //           const res = await axios.get(`${apiUrl}/vlogs/post_stats/${vlog.id_post}`);
+    //           newStatsMap[vlog.id_post] = res.data?.data || { likes_count: 0, shares_count: 0 };
+    //         } catch (err) {
+    //           console.error(`Erreur de stats pour post ${vlog.id_post}`, err);
+    //           newStatsMap[vlog.id_post] = { likes_count: 0, shares_count: 0 };
+    //         }
+    //       })
+    //     );
+    
+    //     setStatsMap(newStatsMap);
+    //   };
+    
+    //   fetchStats();
+    // }, [Allvlog]);
+
     useEffect(() => {
-      console.log(Allvlog)
-      fetchStats();
-    }, [Allvlog]);
-  
-    const fetchStats = async () => {
-      try {
-        const res = await axios.get(`${apiUrl}/vlogs/post_stats/${postId}`);
-      console.log('res stats:', res)
-      
-        if (res.data.success) setStats(res.data.data);
-      } catch (err) {
-        console.error(err);
+      const fetchStats = async () => {
+        try {
+          const statsObj = {};
+    
+          await Promise.all(
+            GroupedVlogs.map(async (vlog) => {
+              try {
+                const res = await axios.get(`${apiUrl}/vlogs/post_stats/${vlog.id_post}`);
+                statsObj[vlog.id_post] = res.data?.data || { likes_count: 0, shares_count: 0 };
+              } catch (err) {
+                statsObj[vlog.id_post] = { likes_count: 0, shares_count: 0 };
+                console.warn("Erreur stats pour", vlog.id_post, err);
+              }
+            })
+          );
+    
+          setStatsMap(statsObj);
+        } catch (err) {
+          console.error("Erreur globale lors de la récupération des stats :", err);
+        }
+      };
+    
+      if (GroupedVlogs.length > 0) {
+        fetchStats();
       }
-    };
+    }, [GroupedVlogs]);
   
     const handleLike = async () => {
+    
       try {
         await axios.post(`${apiUrl}/vlogs/like/${postId}`, { id_user: userId });
         setLiked(!liked);
@@ -122,62 +206,74 @@ function All_Vlogs() {
 </nav>
                     </div>
                     <div className="tab-content">
-  {vlogTypes.map((type, index) => (
-    <div
-      key={type.slug}
-      className={`tab-pane fade ${index === 0 ? 'show active' : ''}`}
-      id={type.slug}
-    >
-      <div className="row">
-        {Allvlog
-          .filter(v => !type.id || v.type_vlog === type.id)
-          .map(v => (
-                                                                  
-            <div className="box col-lg-2 col-md-4 col-4 aos-init aos-animate" key={v?.id} data-aos="fade-up" data-aos-duration="700">
-                                                   
-            <div className="product-card video_card">
+  {vlogTypes.map((type, index) => {
+    const filteredVlogs = GroupedVlogs.filter(v =>
+      type.id ? v.type_vlog === type.id : true
+    );
+  //  console.log('filteredVlogs')
+  //  console.log(filteredVlogs)
+  //  console.log(type)
+  //  console.log(v)
+  //  console.log(filteredVlogs)
+    return (
+      <div
+        key={type.slug}
+        className={`tab-pane fade ${index === 0 ? 'show active' : ''}`}
+        id={type.slug}
+      >
+        <div className="row">
+          {filteredVlogs.map(v => (
+          <div className="box col-lg-2 col-md-4 col-4 aos-init aos-animate" key={v?.id_contenu} data-aos="fade-up" data-aos-duration="700">
+                <div className="product-card video_card">
                 <div className="product-card-img">
-        
-
-          <a
-          className="hover-switch clip_video"
-          data-fancybox="video-gallery"
-          data-caption={v?.titre}
-          data-type="iframe"
-          href={getEmbeddedUrl(v?.path, v?.source)}
-        >
-          <img
-            src={v?.thumbnail || "/default-thumbnail.jpg"}
-            alt="video"
-            loading="lazy"
-            className="img"
-          />
-          <button className="play-button">▶</button>
-        </a>
-        
-
-              
-
-                </div>
-                <div className="card-title">
-                <div className="video-actions">
-      <button onClick={handleLike}>
-        ❤️ {stats.likes_count}
-      </button>
-      <button onClick={handleShare}>
-        🔄 {stats.shares_count}
-      </button>
-    </div>
-                  <label>{v?.titre} </label>
+                  <a
+                    className="hover-switch clip_video"
+                    data-fancybox="video-gallery"
+                    data-caption={v.titre}
+                    data-type="iframe"
+                    href={getEmbeddedUrl(v.path, v.source)}
+                  >
+                    <img
+                      src={v.thumbnail || "/default-thumbnail.jpg"}
+                      alt={v.titre}
+                      loading="lazy"
+                      className="img"
+                    />
+                    <button className="play-button">▶</button>
+                  </a>
                 </div>
 
+                <div className="card-title px-2 pt-1">
+                  <label title={v.titre}>{v.titre}</label>
+
+                  <div className="video-actions d-flex justify-content-between mt-1">
+                    <button
+                      onClick={() => handleLike(v.id_post)}
+                      className="btn btn-sm"
+                    >
+                      ❤️ {statsMap[v.id_post]?.likes_count ?? 0}
+                    </button>
+                    <button
+                      onClick={() => handleShare(v.id_post)}
+                      className="btn btn-sm"
+                    >
+                      🔄 {statsMap[v.id_post]?.shares_count ?? 0}
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
-            </div>
-            // <VideoCard key={v.id} data={v} />
           ))}
+
+          {filteredVlogs.length === 0 && (
+            <div className="col-12 text-center text-muted py-4">
+              Aucune vidéo dans cette catégorie.
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-  ))}
+    );
+  })}
 </div>
 
                 </div>
