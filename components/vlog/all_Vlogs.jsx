@@ -5,6 +5,10 @@ import React, {useState, useEffect} from 'react'
 import axios from 'axios';
 import {apiUrl} from "../../config/apiUrl.js"
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {  faFacebook, faLinkedin, faYoutube, faTiktok, faInstagram } from '@fortawesome/free-brands-svg-icons';
+import { faUserPlus,faEye , faThumbsUp} from '@fortawesome/free-solid-svg-icons';
+
  
 import { useAuth } from '../../Context/AuthenticateContext.jsx';
 import TikTokEmbed from '../TikTokEmbed.jsx';
@@ -28,6 +32,10 @@ function All_Vlogs() {
   
   // const [stats, setStats] = useState({ likes_count: 0, shares_count: 0 });
   const [liked, setLiked] = useState(false);
+  
+   const [hasLiked, setHasLiked] = useState(false);
+  //  const [hasFollowed, setHasFollowed] = useState(false);
+   const [hasview, setHasView] = useState(false);
   const [Allvlog , setAllvlog] = useState([]);
   const [GroupedVlogs, setGroupedVlogs] = useState([]);
   const [statsMap, setStatsMap] = useState({}); // Clé = id_post, Valeur = stats
@@ -113,9 +121,9 @@ function All_Vlogs() {
       fetchVlogs();
     }, []);
     
-    console.log("Allvlog")
-    console.log(Allvlog)
-    console.log(GroupedVlogs)
+    // console.log("Allvlog")
+    // console.log(Allvlog)
+    // console.log(GroupedVlogs)
 
     // useEffect(() => {
     //   const fetchStats = async () => {
@@ -149,6 +157,8 @@ function All_Vlogs() {
             GroupedVlogs.map(async (vlog) => {
               try {
                 const res = await axios.get(`${apiUrl}/vlogs/post_stats/${vlog.id_post}`);
+              console.log(res)
+              
                 statsObj[vlog.id_post] = res.data?.data || { likes_count: 0, shares_count: 0 };
               } catch (err) {
                 statsObj[vlog.id_post] = { likes_count: 0, shares_count: 0 };
@@ -168,18 +178,79 @@ function All_Vlogs() {
       }
     }, [GroupedVlogs]);
   
-    const handleLike = async () => {
-    
+    const handleLike = async (vlog) => {
       try {
-        await axios.post(`${apiUrl}/vlogs/like/${postId}`, { id_user: userId });
-        setLiked(!liked);
-        fetchStats();
+        // console.log(vlog)
+        let postId = vlog.id_post;
+    
+        // Si le post n'existe pas encore, on le crée
+        if (!postId) {
+          // console.log(postId)
+          const resCreate = await axios.post(`${apiUrl}/vlogs/createFromVlog/${vlog.id_contenu}`);
+         
+         console.log("resCreate")
+         console.log(resCreate)
+          if (resCreate.data.success) {
+            postId = resCreate.data.post_id;
+    
+            // Optionnel : mettre à jour localement le vlog avec le nouveau id_post
+            setAllvlog(prev =>
+              prev.map(item =>
+                item.id === vlog.id ? { ...item, id_post: postId } : item
+              )
+            );
+          } else {
+            console.error("Erreur lors de la création du post lié");
+            return;
+          }
+        }
+    
+        console.log("new create postId")
+        console.log(postId)
+        // return false;
+        // Envoi du like
+        const resLike = await axios.post(`${apiUrl}/vlogs/like/${postId}`, {
+          id_user: userId,
+        });
+
+        console.log("resLike")
+        console.log(resLike)
+    
+        if (resLike.data.success) {
+          // Mettre à jour les stats localement
+          setStatsMap(prev => ({
+            ...prev,
+            [postId]: {
+              ...prev[postId],
+              likes_count: (prev[postId]?.likes_count || 0) + 1,
+            },
+          }));
+        }
+    
       } catch (err) {
-        console.error(err);
+        console.error("Erreur handleLike :", err);
       }
     };
+    
+    // const handleLike = async (postId) => {
+
+    //   console.log(postId)
+
+    //   // return false;
+    
+    //   try {
+    //   const like_set =  await axios.post(`${apiUrl}/vlogs/like/${postId}`, { id_user: userId });
+    //     setLiked(!liked);
+
+    //     console.log(like_set)
+    //     return false;
+    //     fetchStats();
+    //   } catch (err) {
+    //     console.error(err);
+    //   }
+    // };
   
-    const handleShare = async () => {
+    const handleView = async () => {
       try {
         await axios.post(`${apiUrl}/vlogs/share/${postId}`, { id_user: userId });
         alert("✅ Partagé !");
@@ -244,22 +315,40 @@ function All_Vlogs() {
                 </div>
 
                 <div className="card-title px-2 pt-1">
+                
+                
                   <label title={v.titre}>{v.titre}</label>
+                  <div className="video-actions d-flex justify-content-between">
+                  
+                                               <a href="#"
+                                                      //  onClick={() => handleLike(pageData)}
+                                                       onClick={() => handleLike(v)}
+                                                       className={`btn_like ${hasLiked === true ? 'active' : ''}`} 
+                                                     
+                                                       disabled={hasLiked === true}  // Désactive le bouton si l'utilisateur a déjà aimé
+                                                    >
+                                                          <FontAwesomeIcon className='icon' icon={faThumbsUp} />
+                                                          <span className="stat"> {statsMap[v.id_post]?.likes_count ?? 0}</span>
+                                                    </a>                                           
+                                                    <a href="#"
+                                                      //  onClick={() => handleFollow(pageData)}
+                                                      // onClick={() => handleView(v.id_post)}
+                                                       className={`btn_like ${hasview === true ? 'active' : ''}`} 
+                                                     
+                                                      //  disabled={hasview === true}  // Désactive le bouton si l'utilisateur a déjà aimé
+                                                     
+                                                   >
+                                                          <FontAwesomeIcon className='icon' icon={faEye} />
+                                                          <span className="stat">
+                                                            {/* {followers_count} */}
+                                                             {statsMap[v.id_post]?.shares_count ?? 0}
 
-                  <div className="video-actions d-flex justify-content-between mt-1">
-                    <button
-                      onClick={() => handleLike(v.id_post)}
-                      className="btn btn-sm"
-                    >
-                      ❤️ {statsMap[v.id_post]?.likes_count ?? 0}
-                    </button>
-                    <button
-                      onClick={() => handleShare(v.id_post)}
-                      className="btn btn-sm"
-                    >
-                      🔄 {statsMap[v.id_post]?.shares_count ?? 0}
-                    </button>
-                  </div>
+                                                          </span>
+                                                    </a>
+                
+                 
+                  
+                </div>
                 </div>
               </div>
             </div>
