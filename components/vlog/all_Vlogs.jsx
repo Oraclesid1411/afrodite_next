@@ -4,7 +4,8 @@ import React, {useState, useEffect} from 'react'
 
 import axios from 'axios';
 import {apiUrl} from "../../config/apiUrl.js"
-
+import { Fancybox } from "@fancyapps/ui";
+import "@fancyapps/ui/dist/fancybox/fancybox.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {  faFacebook, faLinkedin, faYoutube, faTiktok, faInstagram } from '@fortawesome/free-brands-svg-icons';
 import { faUserPlus,faEye , faThumbsUp} from '@fortawesome/free-solid-svg-icons';
@@ -28,22 +29,16 @@ import TikTokEmbed from '../TikTokEmbed.jsx';
 function All_Vlogs() {
 
   const [vlogTypes, setVlogTypes] = useState([]);
-  // const [filterType, setFilterType] = useState('');
-  
-  // const [stats, setStats] = useState({ likes_count: 0, shares_count: 0 });
   const [liked, setLiked] = useState(false);
   
    const [hasLiked, setHasLiked] = useState(false);
-  //  const [hasFollowed, setHasFollowed] = useState(false);
-   const [hasview, setHasView] = useState(false);
+    const [hasview, setHasView] = useState(false);
   const [Allvlog , setAllvlog] = useState([]);
   const [GroupedVlogs, setGroupedVlogs] = useState([]);
   const [statsMap, setStatsMap] = useState({}); // Clé = id_post, Valeur = stats
-
-
+ 
     const auth = useAuth();
     const user_info = auth.currentUser;
-
     const userId  = user_info?.id;
   
   const getEmbeddedUrl = (path, source) => {
@@ -69,27 +64,8 @@ function All_Vlogs() {
   
     return path;
   };
-  
    
-    // useEffect(() => {
-    //   const fetchData = async () => {
-    //     try {
-    //       const [rep , rep1] = await Promise.all([
-    //         axios.get(`${apiUrl}/vlogs/all`),
-    //         axios.get(`${apiUrl}/vlogs/vlog_type`),
-    //        ]);
 
-    //       setAllvlog(rep.data?.vlogs)
-    //       setVlogTypes([{ id: '', libelle: 'Tous', slug: 'all' }, ...rep1.data]);
-        
-        
-    //     } catch (err) {
-    //       console.error("Erreur lors de la récupération des données :", err);
-    //     }
-    //   };
-    //   fetchData();
-    // }, []);
-  
     useEffect(() => {
       const fetchVlogs = async () => {
         try {
@@ -102,6 +78,7 @@ function All_Vlogs() {
     
           // Grouper les vlogs par id_contenu
           const groupedMap = new Map();
+         
           allVlogs.forEach((item) => {
             if (!groupedMap.has(item.id_contenu)) {
               groupedMap.set(item.id_contenu, item);
@@ -113,6 +90,7 @@ function All_Vlogs() {
           setAllvlog(allVlogs);
           setGroupedVlogs(groupedArray);
           setVlogTypes([{ id: '', libelle: 'Tous', slug: 'all' }, ...typesRes.data]);
+      
         } catch (err) {
           console.error("Erreur lors du chargement des vlogs :", err);
         }
@@ -121,33 +99,6 @@ function All_Vlogs() {
       fetchVlogs();
     }, []);
     
-    // console.log("Allvlog")
-    // console.log(Allvlog)
-    // console.log(GroupedVlogs)
-
-    // useEffect(() => {
-    //   const fetchStats = async () => {
-    //     if (!Allvlog.length) return;
-    
-    //     const newStatsMap = {};
-    //     await Promise.all(
-    //       Allvlog.map(async (vlog) => {
-    //         try {
-    //           const res = await axios.get(`${apiUrl}/vlogs/post_stats/${vlog.id_post}`);
-    //           newStatsMap[vlog.id_post] = res.data?.data || { likes_count: 0, shares_count: 0 };
-    //         } catch (err) {
-    //           console.error(`Erreur de stats pour post ${vlog.id_post}`, err);
-    //           newStatsMap[vlog.id_post] = { likes_count: 0, shares_count: 0 };
-    //         }
-    //       })
-    //     );
-    
-    //     setStatsMap(newStatsMap);
-    //   };
-    
-    //   fetchStats();
-    // }, [Allvlog]);
-
     useEffect(() => {
       const fetchStats = async () => {
         try {
@@ -157,12 +108,13 @@ function All_Vlogs() {
             GroupedVlogs.map(async (vlog) => {
               try {
                 const res = await axios.get(`${apiUrl}/vlogs/post_stats/${vlog.id_post}`);
+              console.log('stats')
               console.log(res)
               
                 statsObj[vlog.id_post] = res.data?.data || { likes_count: 0, shares_count: 0 };
               } catch (err) {
                 statsObj[vlog.id_post] = { likes_count: 0, shares_count: 0 };
-                console.warn("Erreur stats pour", vlog.id_post, err);
+                // console.warn("Erreur stats pour", vlog.id_post, err);
               }
             })
           );
@@ -231,34 +183,30 @@ function All_Vlogs() {
         console.error("Erreur handleLike :", err);
       }
     };
-    
-    // const handleLike = async (postId) => {
 
-    //   console.log(postId)
-
-    //   // return false;
-    
-    //   try {
-    //   const like_set =  await axios.post(`${apiUrl}/vlogs/like/${postId}`, { id_user: userId });
-    //     setLiked(!liked);
-
-    //     console.log(like_set)
-    //     return false;
-    //     fetchStats();
-    //   } catch (err) {
-    //     console.error(err);
-    //   }
-    // };
-  
-    const handleView = async () => {
+    const handleView = async (postId) => {
+      // alert('test')
       try {
-        await axios.post(`${apiUrl}/vlogs/share/${postId}`, { id_user: userId });
-        alert("✅ Partagé !");
-        fetchStats();
+    const  res =  await axios.post(`${apiUrl}/vlogs/view/${postId}`);
+        // Optionnel : mettre à jour le statsMap si nécessaire
+        console.log("res")
+        console.log(res)
+        if (res.data.success) {
+          // Mettre à jour les stats localement
+          setStatsMap(prev => ({
+            ...prev,
+            [postId]: {
+              ...prev[postId],
+              view_count: (prev[postId]?.view_count || 0) + 1,
+            },
+          }));
+        }
       } catch (err) {
-        console.error(err);
+        console.error("Erreur d'enregistrement de la vue :", err);
       }
     };
+    
+    
   return (
     <>
                 <div className="container tab_list_box mb-3">
@@ -297,12 +245,32 @@ function All_Vlogs() {
           <div className="box col-lg-2 col-md-4 col-4 aos-init aos-animate" key={v?.id_contenu} data-aos="fade-up" data-aos-duration="700">
                 <div className="product-card video_card">
                 <div className="product-card-img">
-                  <a
+                  {/* <a
                     className="hover-switch clip_video"
                     data-fancybox="video-gallery"
-                    data-caption={v.titre}
-                    data-type="iframe"
-                    href={getEmbeddedUrl(v.path, v.source)}
+                    // data-caption={v.titre}
+                    // data-type="iframe"
+                    data-post-id={v.id_post}
+                    // href={getEmbeddedUrl(v.path, v.source)}
+
+                    // data-fancybox="video-gallery"
+                    // data-caption={v.titre}
+                    // data-type="iframe"
+                    href="#"
+                     onClick={(e) => {
+                     
+                      handleView(v.id_post); // Compte la vue
+                      e.preventDefault(); // ⛔️ indispensable pour éviter le comportement par défaut du lien
+    
+                      Fancybox.show([
+                        {
+                          src: getEmbeddedUrl(v.path, v.source), // lien vers YouTube, TikTok, etc.
+                          type: "iframe",
+                          caption: v.titre
+                        }
+                      ]);
+                    }}
+                    // href={getEmbeddedUrl(v.path, v.source)}
                   >
                     <img
                       src={v.thumbnail || "/default-thumbnail.jpg"}
@@ -311,7 +279,26 @@ function All_Vlogs() {
                       className="img"
                     />
                     <button className="play-button">▶</button>
-                  </a>
+                  </a> */}
+
+<a
+  className="hover-switch clip_video"
+  data-fancybox="video-gallery"
+  data-type="iframe"
+  data-caption={v.titre}
+  data-post-id={v.id_post}
+  href={getEmbeddedUrl(v.path, v.source)}
+  onClick={() => handleView(v.id_post)}
+>
+  <img
+    src={v.thumbnail || "/default-thumbnail.jpg"}
+    alt={v.titre}
+    loading="lazy"
+    className="img"
+  />
+  <button className="play-button">▶</button>
+</a>
+
                 </div>
 
                 <div className="card-title px-2 pt-1">
@@ -341,7 +328,7 @@ function All_Vlogs() {
                                                           <FontAwesomeIcon className='icon' icon={faEye} />
                                                           <span className="stat">
                                                             {/* {followers_count} */}
-                                                             {statsMap[v.id_post]?.shares_count ?? 0}
+                                                             {statsMap[v.id_post]?.view_count ?? 0}
 
                                                           </span>
                                                     </a>
