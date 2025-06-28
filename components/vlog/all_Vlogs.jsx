@@ -41,30 +41,57 @@ function All_Vlogs() {
     const user_info = auth.currentUser;
     const userId  = user_info?.id;
   
+  // const getEmbeddedUrl = (path, source) => {
+  //   if (source === 2) {
+  //     // YouTube
+  //     const videoId = path.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]+)/)?.[1];
+  //     return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+  //   }
+  
+  //   if (source === 3) {
+  //     // TikTok
+  //     const videoId = path.match(/\/video\/(\d+)/)?.[1];
+  //     const username = path.match(/@([a-zA-Z0-9._]+)/)?.[1];
+  //     if (videoId && username) {
+  //       return `https://www.tiktok.com/embed/v2/${videoId}`;
+  //     }
+  //   }
+  
+  //   if (source === 1) {
+  //     // Local
+  //     return path;
+  //   }
+  
+  //   return path;
+  // };
   const getEmbeddedUrl = (path, source) => {
     if (source === 2) {
-      // YouTube
+      // 🎬 YouTube
       const videoId = path.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]+)/)?.[1];
-      return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+      if (videoId) {
+        // 🔇 mute=1 est souvent nécessaire pour autoplay sans interaction
+        return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&rel=0`;
+      }
     }
   
     if (source === 3) {
-      // TikTok
+      // 📱 TikTok (⚠️ autoplay souvent bloqué)
       const videoId = path.match(/\/video\/(\d+)/)?.[1];
-      const username = path.match(/@([a-zA-Z0-9._]+)/)?.[1];
-      if (videoId && username) {
+      if (videoId) {
+        // ⚠️ autoplay ici n'est pas toujours pris en compte, TikTok ne le supporte pas bien
         return `https://www.tiktok.com/embed/v2/${videoId}`;
       }
     }
   
     if (source === 1) {
-      // Local
-      return path;
+      // 💻 Vidéo locale (MP4, etc.)
+      return `${path}?autoplay=1&muted=1`; // 🔇 muted conseillé aussi ici
     }
   
     return path;
   };
-   
+  
+  
 
     useEffect(() => {
       const fetchVlogs = async () => {
