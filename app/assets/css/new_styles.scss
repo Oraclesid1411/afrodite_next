@@ -3349,3 +3349,15 @@ margin-top: 1em;
     font-weight: 550;
   }
 }
+.fancybox-slide.fancybox-slide--complete .fancybox-content
+ {
+  // padding:1em !important; 
+  width: 100%;
+  max-width: 100%;
+// border: 2px solid lime !important
+} 
+.fancybox-inner .fancybox-content iframe.fancybox-iframe
+{
+  // padding:1em !important;
+   border: 0px solid lime !important
+  }
